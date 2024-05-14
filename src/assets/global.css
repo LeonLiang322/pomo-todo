@@ -1,0 +1,69 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'Harmony Sans';
+  src: url('/fonts/HarmonySans_Regular.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'HarmonyOS Sans SC';
+  src: url('/fonts/HarmonySans_Bold.woff2') format('woff2');
+  font-weight: bold;
+  font-style: normal;
+}
+
+* {
+  font-family: 'Harmony Sans', sans-serif;
+}
+
+.drag-enabled {
+  -webkit-app-region: drag;
+}
+
+.drag-disabled {
+  -webkit-app-region: no-drag;
+}
+
+.ctl-btn {
+  @apply w-16 h-full flex justify-center items-center cursor-pointer;
+  -webkit-app-region: no-drag;
+}
+
+.ctl-btn:hover {
+  @apply bg-gray-200;
+}
+
+.ctl-btn div {
+  @apply w-4 h-4 border-2 rounded-full cursor-pointer;
+}
+
+.pomo-ctl-btn {
+  @apply w-20 h-20 mx-4
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent; /* 轨道颜色 */
+}
+
+::-webkit-scrollbar-button {
+  width: .5rem;
+  height: .5rem;
+}
+
+::-webkit-scrollbar-thumb {
+  margin-top: 5px;
+  background: #888; /* 滑块颜色 */
+  border-radius: 4px; /* 滑块圆角 */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555; /* 滑块悬停颜色 */
+}
