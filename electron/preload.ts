@@ -31,22 +31,22 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
     ipcRenderer.send('log', data)
   },
   sStoreGet(key: string) {
-    return ipcRenderer.sendSync('storeGet', key)
+    return ipcRenderer.sendSync('sStoreGet', key)
   },
-  sStoreSet(key: string, value: any) {
-    ipcRenderer.send('storeSet', key, value)
+  sStoreSet(data: object) {
+    ipcRenderer.send('sStoreSet', data)
   },
-  sStoreDel(key: string) {
-    ipcRenderer.send('storeDel', key)
+  sStoreDel(keys: string[]) {
+    ipcRenderer.send('sStoreDel', keys)
   },
   cStoreGet(key: string) {
     return ipcRenderer.sendSync('cStoreGet', key)
   },
-  cStoreSet(key: string, value: any) {
-    ipcRenderer.send('cStoreSet', key, value)
+  cStoreSet(data: object) {
+    ipcRenderer.send('cStoreSet', data)
   },
-  cStoreDel(key: string) {
-    ipcRenderer.send('cStoreDel', key)
+  cStoreDel(keys: string[]) {
+    ipcRenderer.send('cStoreDel', keys)
   },
 
 

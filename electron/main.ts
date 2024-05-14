@@ -83,12 +83,12 @@ ipcMain.on('cStoreGet', (e, key) => {
   e.returnValue = value || ""
 })
 
-ipcMain.on('cStoreSet', (e, key, value) => {
-  configStore.set(key, value)
+ipcMain.on('cStoreSet', (e, data) => {
+  configStore.set(data)
 })
 
-ipcMain.on('cStoreDel', (e, key) => {
-  configStore.delete(key)
+ipcMain.on('cStoreDel', (e, keys) => {
+  for (const key of keys) configStore.delete(key)
 })
 
 ipcMain.on('sStoreGet', (e, key) => {
@@ -96,12 +96,12 @@ ipcMain.on('sStoreGet', (e, key) => {
   e.returnValue = value || ""
 })
 
-ipcMain.on('sStoreSet', (e, key, value) => {
-  sessionStore.set(key, value)
+ipcMain.on('sStoreSet', (e, data) => {
+  sessionStore.set(data)
 })
 
-ipcMain.on('sStoreDel', (e, key) => {
-  sessionStore.delete(key)
+ipcMain.on('sStoreDel', (e, keys) => {
+  for (const key of keys) sessionStore.delete(key)
 })
 
 app.whenReady().then(() => {

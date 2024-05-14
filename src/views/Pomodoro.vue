@@ -39,8 +39,8 @@ const startFocus = () => {
   isFocusPeriod.value = true;
   const duration = focusMinutes.value[0] * 60 * 1000; // Convert minutes to milliseconds
   startTimer(duration, true);
-  window.ipcRenderer.cStoreSet('focusMinutes', focusMinutes.value[0]);
-  window.ipcRenderer.cStoreSet('breakMinutes', breakMinutes.value[0]);
+  ipc.cStoreSet({'focusMinutes': focusMinutes.value[0]});
+  ipc.cStoreSet({'breakMinutes': breakMinutes.value[0]});
 };
 
 const startBreak = () => {
@@ -51,7 +51,7 @@ const startBreak = () => {
 
 const startTimer = (duration, isFocus) => {
   timer = new CountdownTimer(
-      duration/8,
+      duration,
       (remaining) => updateFormattedTime(remaining, isFocus),
       () => {
         updateFormattedTime(0, isFocus);
@@ -64,23 +64,29 @@ const startTimer = (duration, isFocus) => {
   isStarted.value = true;
   isPaused.value = false;
   const endTime = dayjs().add(timer.getRemainingTime(), 'millisecond').valueOf();
-  sessionStorage.setItem('endTime', endTime);
-  sessionStorage.setItem('isFocusPeriod', isFocus);
-  sessionStorage.removeItem('timeLeft');
+  // sessionStorage.setItem('endTime', endTime);
+  // sessionStorage.setItem('isFocusPeriod', isFocus);
+  // sessionStorage.removeItem('timeLeft');
+  ipc.sStoreSet({'endTime': endTime, 'isFocusPeriod': isFocus});
+  ipc.sStoreDel(['timeLeft'])
 };
 
 const pause = () => {
   timer.pause();
-  sessionStorage.setItem('timeLeft', timer.getRemainingTime());
-  sessionStorage.removeItem('endTime');
+  // sessionStorage.setItem('timeLeft', timer.getRemainingTime());
+  // sessionStorage.removeItem('endTime');
+  ipc.sStoreSet({'timeLeft': timer.getRemainingTime()});
+  ipc.sStoreDel(['endTime']);
   isPaused.value = true;
 };
 
 const resume = () => {
   timer.resume();
   const endTime = dayjs().add(timer.getRemainingTime(), 'millisecond').valueOf();
-  sessionStorage.setItem('endTime', endTime);
-  sessionStorage.removeItem('timeLeft');
+  // sessionStorage.setItem('endTime', endTime);
+  // sessionStorage.removeItem('timeLeft');
+  ipc.sStoreSet({'endTime': endTime});
+  ipc.sStoreDel(['timeLeft']);
   isPaused.value = false;
 };
 
@@ -89,15 +95,19 @@ const stop = () => {
   updateFormattedTime(0, isFocusPeriod.value);
   timerStarted.value = false;
   isStarted.value = false;
-  sessionStorage.removeItem('timeLeft');
-  sessionStorage.removeItem('endTime');
-  sessionStorage.removeItem('isFocusPeriod');
+  // sessionStorage.removeItem('timeLeft');
+  // sessionStorage.removeItem('endTime');
+  // sessionStorage.removeItem('isFocusPeriod');
+  ipc.sStoreDel(['timeLeft', 'endTime', 'isFocusPeriod']);
 };
 
 const checkSessionStorage = () => {
-  const timeLeft = sessionStorage.getItem('timeLeft');
-  const endTime = sessionStorage.getItem('endTime');
-  const storedIsFocusPeriod = sessionStorage.getItem('isFocusPeriod');
+  // const timeLeft = sessionStorage.getItem('timeLeft');
+  // const endTime = sessionStorage.getItem('endTime');
+  // const storedIsFocusPeriod = sessionStorage.getItem('isFocusPeriod');
+  const timeLeft = ipc.sStoreGet('timeLeft');
+  const endTime = ipc.sStoreGet('endTime');
+  const storedIsFocusPeriod = ipc.sStoreGet('isFocusPeriod');
 
   if (timeLeft) {
     const isFocus = storedIsFocusPeriod === 'true';
