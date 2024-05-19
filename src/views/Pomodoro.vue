@@ -41,6 +41,7 @@ const startTimer = () => {
   ipc.send('timer-control', { command: 'start' });
   isStarted.value = true;
   isPaused.value = false;
+  ipc.send('config-store-set', { 'focusMinutes': focusMinutes.value[0], 'breakMinutes': breakMinutes.value[0] });
 };
 
 const pauseTimer = () => {
