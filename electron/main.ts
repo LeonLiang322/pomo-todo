@@ -59,7 +59,7 @@ function createWindow() {
   win.on('closed', () => {
     win = null;
     if (timerWorker) {
-      timerWorker.terminate();
+      timerWorker.terminate().then();
       timerWorker = null;
     }
   });
@@ -90,7 +90,20 @@ ipcMain.on('timer-create-worker', (event, startData) => {
     console.log('timerWorker created', startData)
 
     timerWorker.on('message', (data: any) => {
-      win?.webContents.send('timer-update', data);
+      switch (data.type) {
+        case 'pomo-period-toggled':
+          win?.webContents.send('show-toast', {
+            title: '专注时钟',
+            description: data.isFocusPeriod ? '专注计时开始' : '休息计时开始'
+          });
+          break;
+        case 'pomo-status-updated':
+          win?.webContents.send('pomo-update-badge', data);
+          break;
+        default:
+          win?.webContents.send('timer-update', data);
+          break;
+      }
     });
 
     timerWorker.on('error', (err: any) => {
@@ -104,20 +117,8 @@ ipcMain.on('timer-create-worker', (event, startData) => {
   }
 });
 
-ipcMain.on('timer-terminate', () => {
-  timerWorker?.terminate();
-  timerWorker = null;
-});
-
-// 接收来自渲染进程的控制命令
-ipcMain.on('timer-control', (event, message) => {
-  console.log('timer-control', message)
-  timerWorker?.postMessage(message);
-});
-
 ipcMain.on('get-timer-status', (event) => {
   if (timerWorker) {
-    console.log('get-timer-status')
     timerWorker.postMessage({ command: 'get-status' });
     timerWorker.once('message', (data) => {
       event.reply('timer-status', {
@@ -129,6 +130,17 @@ ipcMain.on('get-timer-status', (event) => {
   } else {
     event.reply('timer-status', null);
   }
+});
+
+ipcMain.on('timer-control', (event, message) => {
+  console.log('timer-control', message)
+  timerWorker?.postMessage(message);
+});
+
+ipcMain.on('timer-terminate', () => {
+  timerWorker?.terminate();
+  timerWorker = null;
+  win?.webContents.send('pomo-update-badge', { status: 'stopped', isFocusPeriod: true });
 });
 
 ipcMain.on('min', (e) => {
@@ -146,10 +158,6 @@ ipcMain.on('max', (e) => {
 ipcMain.on('close', (e) => {
   win?.close()
 })
-
-ipcMain.on('log', (e, data) => {
-  console.log('log', data)
-});
 
 const db = require('../src/db/connect.ts')
 

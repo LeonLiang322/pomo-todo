@@ -10,6 +10,7 @@ let isRunning = false;
 const startTimer = () => {
   if (!isRunning) {
     isRunning = true;
+    parentPort.postMessage({ type: 'pomo-status-updated', status: 'started', isFocusPeriod });
     timer = setInterval(() => {
       countdown--;
       parentPort.postMessage({ remainingTime: countdown, isFocusPeriod });
@@ -25,6 +26,7 @@ const startTimer = () => {
 const togglePeriod = () => {
   isFocusPeriod = !isFocusPeriod; // 切换周期
   countdown = isFocusPeriod ? focusTime : breakTime; // 设置为相应周期的时长
+  parentPort.postMessage({ type: 'pomo-period-toggled', isFocusPeriod });
   startTimer(); // 自动开始下一个周期
 };
 
@@ -38,6 +40,7 @@ parentPort.on('message', (message) => {
     case 'pause':
       if (timer) {
         clearInterval(timer);
+        parentPort.postMessage({ type: 'pomo-status-updated', status: 'paused', isFocusPeriod });
         timer = null;
         isRunning = false;
       }
@@ -45,7 +48,7 @@ parentPort.on('message', (message) => {
     case 'resume':
       startTimer();
       break;
-    case 'stop':
+    case 'stop':  // not in use
       if (timer) {
         clearInterval(timer);
         timer = null;

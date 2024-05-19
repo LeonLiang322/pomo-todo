@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory, Router, RouteRecordRaw } from 'vue-router';
+import routerConfig from "@/lib/routerConfig.ts";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -6,27 +7,8 @@ const routes: Array<RouteRecordRaw> = [
     redirect: '/dashboard',
     component: () => import('@/layouts/AppLayout.vue'),
     children: [
-        {
-            path: 'dashboard',
-            name: 'Dashboard',
-            component: () => import('@/views/Dashboard.vue'),
-        },
-        {
-            path: 'today',
-            name: 'Today',
-            component: () => import('@/views/Today.vue'),
-        },
-        {
-            path: 'todo',
-            name: 'todo',
-            component: () => import('@/views/Todo.vue'),
-        },
-        {
-            path: 'pomo',
-            name: 'Pomodoro',
-            component: () => import('@/views/Pomodoro.vue'),
-        }
-    ],
+        ...routerConfig,
+    ]
   },
 ];
 

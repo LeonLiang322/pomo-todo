@@ -24,10 +24,25 @@ html, body, #app {
   font-family: 'Harmony Sans', sans-serif;
 }
 
+.menu-item {
+  @apply text-muted-foreground transition-colors hover:text-foreground cursor-pointer flex items-center;
+}
+
+.toolbar {
+  @apply flex items-center gap-4 drag-disabled;
+}
+.toolbar button {
+  @apply w-9 h-9;
+}
+
+.pomo-ctl-btn {
+  @apply w-20 h-20 mx-4;
+}
+
+
 .drag-enabled {
   -webkit-app-region: drag;
 }
-
 .drag-disabled {
   -webkit-app-region: no-drag;
 }
@@ -36,42 +51,28 @@ html, body, #app {
   @apply w-16 h-full flex justify-center items-center cursor-pointer;
   -webkit-app-region: no-drag;
 }
-
 .ctl-btn:hover {
   @apply bg-gray-200;
 }
-
 .ctl-btn div {
   @apply w-4 h-4 border-2 rounded-full cursor-pointer;
-}
-
-.menu-item {
-  @apply text-muted-foreground transition-colors hover:text-foreground cursor-pointer;
-}
-
-.pomo-ctl-btn {
-  @apply w-20 h-20 mx-4;
 }
 
 ::-webkit-scrollbar {
   width: 4px;
 }
-
 ::-webkit-scrollbar-track {
   background: transparent; /* 轨道颜色 */
 }
-
 ::-webkit-scrollbar-button {
   width: .5rem;
   height: .5rem;
 }
-
 ::-webkit-scrollbar-thumb {
   margin-top: 5px;
   background: #888; /* 滑块颜色 */
   border-radius: 4px; /* 滑块圆角 */
 }
-
 ::-webkit-scrollbar-thumb:hover {
   background: #555; /* 滑块悬停颜色 */
 }
