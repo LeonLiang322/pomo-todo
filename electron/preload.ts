@@ -6,50 +6,29 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
     const [channel, listener] = args
     return ipcRenderer.on(channel, (event, ...args) => listener(event, ...args))
   },
+  once(...args: Parameters<typeof ipcRenderer.once>) {
+    const [channel, listener] = args
+    return ipcRenderer.once(channel, (event, ...args) => listener(event, ...args))
+  },
   off(...args: Parameters<typeof ipcRenderer.off>) {
+    console.log('off', args)
     const [channel, ...omit] = args
     return ipcRenderer.off(channel, ...omit)
+  },
+  removeAllListeners(...args: Parameters<typeof ipcRenderer.removeAllListeners>) {
+    const [channel, ...omit] = args
+    return ipcRenderer.removeAllListeners(channel, ...omit)
   },
   send(...args: Parameters<typeof ipcRenderer.send>) {
     const [channel, ...omit] = args
     return ipcRenderer.send(channel, ...omit)
   },
+  sendSync(...args: Parameters<typeof ipcRenderer.sendSync>) {
+    const [channel, ...omit] = args
+    return ipcRenderer.sendSync(channel, ...omit)
+  },
   invoke(...args: Parameters<typeof ipcRenderer.invoke>) {
     const [channel, ...omit] = args
     return ipcRenderer.invoke(channel, ...omit)
   },
-  min() {
-    ipcRenderer.send('min')
-  },
-  max() {
-    ipcRenderer.send('max')
-  },
-  close() {
-    ipcRenderer.send('close')
-  },
-  log(data: any) {
-    ipcRenderer.send('log', data)
-  },
-  sStoreGet(key: string) {
-    return ipcRenderer.sendSync('sStoreGet', key)
-  },
-  sStoreSet(data: object) {
-    ipcRenderer.send('sStoreSet', data)
-  },
-  sStoreDel(keys: string[]) {
-    ipcRenderer.send('sStoreDel', keys)
-  },
-  cStoreGet(key: string) {
-    return ipcRenderer.sendSync('cStoreGet', key)
-  },
-  cStoreSet(data: object) {
-    ipcRenderer.send('cStoreSet', data)
-  },
-  cStoreDel(keys: string[]) {
-    ipcRenderer.send('cStoreDel', keys)
-  },
-
-
-  // You can expose other APTs you need here.
-  // ...
 })

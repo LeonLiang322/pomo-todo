@@ -1,12 +1,13 @@
 <script setup lang="ts">
+const ipc = (window as any).ipcRenderer;
 const min = () => {
-  (window as any).ipcRenderer.min()
+  ipc.send('min');
 }
 const max = () => {
-  (window as any).ipcRenderer.max()
+  ipc.send('max');
 }
 const close = () => {
-  (window as any).ipcRenderer.close()
+  ipc.send('close');
 }
 </script>
 

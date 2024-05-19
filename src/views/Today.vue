@@ -3,9 +3,5 @@
 </script>
 
 <template>
-Today
+  aaa
 </template>
-
-<style scoped>
-
-</style>

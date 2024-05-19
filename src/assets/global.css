@@ -16,6 +16,10 @@
   font-style: normal;
 }
 
+html, body, #app {
+  @apply h-full m-0 p-0;
+}
+
 * {
   font-family: 'Harmony Sans', sans-serif;
 }
@@ -41,8 +45,12 @@
   @apply w-4 h-4 border-2 rounded-full cursor-pointer;
 }
 
+.menu-item {
+  @apply text-muted-foreground transition-colors hover:text-foreground cursor-pointer;
+}
+
 .pomo-ctl-btn {
-  @apply w-20 h-20 mx-4
+  @apply w-20 h-20 mx-4;
 }
 
 ::-webkit-scrollbar {

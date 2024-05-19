@@ -1,50 +1,59 @@
 <script setup lang="ts">
+import { onMounted, ref } from "vue";
+import router from "@/router";
 import { Menu, Package2 } from 'lucide-vue-next'
-
 import { Button } from '@/components/ui/button'
-
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
-import WindowCtl from "@/components/WindowCtl.vue";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { Toaster } from "@/components/ui/toast";
+import WindowCtl from "@/components/WindowCtl.vue";
+
+const ipc = (window as any).ipcRenderer;
+const sheet = ref(false);
+
+const redirect = (path: string) => {
+  router.push(path);
+};
+
 </script>
 
 <template>
-  <div class="flex min-h-screen w-full flex-col">
+  <div class="flex w-full h-full flex-col">
     <header class="sticky top-0 flex h-14 items-center gap-4 border-b bg-background px-4 md:px-6 drag-enabled">
+
       <nav class="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6 drag-disabled">
-        <a
-            href="/dashboard"
+        <div
             class="flex items-center gap-2 text-lg font-semibold md:text-base"
+            @click="redirect('/dashboard')"
         >
           <Package2 class="h-6 w-6" />
           <span class="sr-only">Acme Inc</span>
-        </a>
-        <a
-            href="/dashboard"
-            class="text-foreground transition-colors hover:text-foreground"
+        </div>
+        <div
+            class="menu-item"
+            @click="redirect('/dashboard')"
         >
           数据面板
-        </a>
-        <a
-            href="/today"
-            class="text-muted-foreground transition-colors hover:text-foreground"
+        </div>
+        <div
+            class="menu-item"
+            @click="redirect('/today')"
         >
           我的一天
-        </a>
-        <a
-            href="/todo"
-            class="text-muted-foreground transition-colors hover:text-foreground"
+        </div>
+        <div
+            class="menu-item"
+            @click="redirect('/todo')"
         >
           计划任务
-        </a>
-        <a
-            href="/pomo"
-            class="text-muted-foreground transition-colors hover:text-foreground"
+        </div>
+        <div
+            class="menu-item"
+            @click="redirect('/pomo')"
         >
           专注时钟
-        </a>
+        </div>
       </nav>
-      <Sheet>
+      <Sheet v-model:open="sheet">
         <SheetTrigger as-child>
           <Button
               variant="outline"
@@ -55,49 +64,45 @@ import { Toaster } from "@/components/ui/toast";
             <span class="sr-only">Toggle navigation menu</span>
           </Button>
         </SheetTrigger>
-        <SheetContent side="left">
+
+        <SheetContent side="left" @click="sheet = false">
+          <SheetDescription />
+          <SheetTitle>
+            <Package2 class="h-6 w-6 mb-6" />
+          </SheetTitle>
           <nav class="grid gap-6 text-lg font-medium">
-            <a
-                href="#"
-                class="flex items-center gap-2 text-lg font-semibold"
+
+            <div
+                class="menu-item"
+                @click="redirect('/dashboard')"
             >
-              <Package2 class="h-6 w-6" />
-              <span class="sr-only">Acme Inc</span>
-            </a>
-            <a href="#" class="hover:text-foreground">
-              Dashboard
-            </a>
-            <a
-                href="#"
-                class="text-muted-foreground hover:text-foreground"
+              数据面板
+            </div>
+            <div
+                class="menu-item"
+                @click="redirect('/today')"
             >
-              Orders
-            </a>
-            <a
-                href="#"
-                class="text-muted-foreground hover:text-foreground"
+              我的一天
+            </div>
+            <div
+                class="menu-item"
+                @click="redirect('/todo')"
             >
-              Products
-            </a>
-            <a
-                href="#"
-                class="text-muted-foreground hover:text-foreground"
+              计划任务
+            </div>
+            <div
+                class="menu-item"
+                @click="redirect('/pomo')"
             >
-              Customers
-            </a>
-            <a
-                href="#"
-                class="text-muted-foreground hover:text-foreground"
-            >
-              Analytics
-            </a>
+              专注时钟
+            </div>
           </nav>
         </SheetContent>
       </Sheet>
       <WindowCtl />
     </header>
-    <main class="py-4 px-6">
-      <RouterView />
+    <main class="px-8 h-full w-full flex items-center justify-center overflow-auto">
+      <RouterView/>
     </main>
     <Toaster />
   </div>
