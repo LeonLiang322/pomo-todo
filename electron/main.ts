@@ -1,8 +1,11 @@
-import { app, ipcMain, BrowserWindow } from 'electron';
-import Store from 'electron-store';
+import { app, BrowserWindow } from 'electron';
 import path from 'node:path';
 import windowStateKeeper from 'electron-window-state';
 import { Worker } from 'worker_threads';
+import { initWindowHandlers } from "../utils/windowIpcHandler.ts";
+import { initTimerHandlers } from "../utils/timerIpcHandler.ts";
+import { initStoreHandlers } from "../utils/storeIpcHandler.ts";
+import initDataBase from "../utils/dbIpcHandler.ts";
 
 process.env.DIST = path.join(__dirname, '../dist');
 process.env.VITE_PUBLIC = app.isPackaged ? process.env.DIST : path.join(process.env.DIST, '../public');
@@ -10,8 +13,6 @@ process.env.VITE_PUBLIC = app.isPackaged ? process.env.DIST : path.join(process.
 let win: BrowserWindow | null;
 // 🚧 Use ['ENV_NAME'] avoid vite:define plugin - Vite@2.x
 const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL'];
-
-const configStore = new Store({ name: 'config' });
 
 let timerWorker: Worker | null = null;
 
@@ -32,6 +33,8 @@ function createWindow() {
     y: mainWindowState.y,
     width: mainWindowState.width,
     height: mainWindowState.height,
+    minWidth: 300,
+    minHeight: 500,
     frame: false,
     show: false
   })
@@ -48,9 +51,7 @@ function createWindow() {
   })
 
   if (VITE_DEV_SERVER_URL) {
-    win.loadURL(VITE_DEV_SERVER_URL).then(() => {
-      console.log('Dev Server', VITE_DEV_SERVER_URL);
-    })
+    win.loadURL(VITE_DEV_SERVER_URL).then();
   } else {
     // win.loadFile('dist/index.html')
     win.loadFile(path.join(process.env.DIST, 'index.html')).then();
@@ -63,7 +64,13 @@ function createWindow() {
       timerWorker = null;
     }
   });
+
+  initWindowHandlers(win);
+  initTimerHandlers(win);
 }
+
+initStoreHandlers();
+initDataBase();
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
@@ -81,112 +88,6 @@ app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow()
   }
-})
-
-ipcMain.on('timer-create-worker', (event, startData) => {
-  if (!timerWorker) {
-    timerWorker = new Worker(path.join(__dirname, '../worker/timerWorker.js'), { workerData: startData });
-
-    console.log('timerWorker created', startData)
-
-    timerWorker.on('message', (data: any) => {
-      switch (data.type) {
-        case 'pomo-period-toggled':
-          win?.webContents.send('show-toast', {
-            title: '专注时钟',
-            description: data.isFocusPeriod ? '专注计时开始' : '休息计时开始'
-          });
-          break;
-        case 'pomo-status-updated':
-          win?.webContents.send('pomo-update-badge', data);
-          break;
-        default:
-          win?.webContents.send('timer-update', data);
-          break;
-      }
-    });
-
-    timerWorker.on('error', (err: any) => {
-      console.error('Worker error:', err);
-    });
-
-    timerWorker.on('exit', (code: any) => {
-      if (code !== 0) console.log(`Worker stopped with exit code ${code}`);
-      timerWorker = null;
-    });
-  }
-});
-
-ipcMain.on('get-timer-status', (event) => {
-  if (timerWorker) {
-    timerWorker.postMessage({ command: 'get-status' });
-    timerWorker.once('message', (data) => {
-      event.reply('timer-status', {
-        isRunning: data.isRunning,
-        remainingTime: data.remainingTime,
-        isFocusPeriod: data.isFocusPeriod
-      });
-    });
-  } else {
-    event.reply('timer-status', null);
-  }
-});
-
-ipcMain.on('timer-control', (event, message) => {
-  console.log('timer-control', message)
-  timerWorker?.postMessage(message);
-});
-
-ipcMain.on('timer-terminate', () => {
-  timerWorker?.terminate();
-  timerWorker = null;
-  win?.webContents.send('pomo-update-badge', { status: 'stopped', isFocusPeriod: true });
-});
-
-ipcMain.on('min', (e) => {
-  win?.minimize();
-})
-
-ipcMain.on('max', (e) => {
-  if (win?.isMaximized()) {
-    win?.unmaximize()
-  } else {
-    win?.maximize()
-  }
-})
-
-ipcMain.on('close', (e) => {
-  win?.close()
-})
-
-const db = require('../src/db/connect.ts')
-
-const sessionStore = new Store({ name: 'session' })
-
-ipcMain.on('config-store-get', (e, key) => {
-  const value = configStore.get(key)
-  e.returnValue = value || ""
-})
-
-ipcMain.on('config-store-set', (e, data) => {
-  configStore.set(data)
-})
-
-ipcMain.on('config-store-del', (e, keys) => {
-  for (const key of keys) configStore.delete(key)
-})
-
-ipcMain.on('session-store-get', (e, key) => {
-  const value = sessionStore.get(key)
-  e.returnValue = value || ""
-})
-
-ipcMain.on('sStoreSet', (e, data) => {
-  sessionStore.set(data)
-})
-
-ipcMain.on('sStoreDel', (e, keys) => {
-  for (const key of keys) sessionStore.delete(key)
 })
 
 app.whenReady().then(() => {

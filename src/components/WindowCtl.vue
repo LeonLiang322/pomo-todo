@@ -14,13 +14,13 @@ const close = () => {
 <template>
   <div class="absolute right-0 flex items-center h-full">
     <!--<div class="ctl-btn bg-green-500 border-green-600" />-->
-    <div class="ctl-btn z-10" @click="min">
+    <div class="win-ctl-btn z-10" @click="min">
       <div class="bg-green-500 border-green-600 cursor-pointer" />
     </div>
-    <div class="ctl-btn" @click="max">
+    <div class="win-ctl-btn" @click="max">
       <div class="bg-yellow-400 border-amber-500" />
     </div>
-    <div class="ctl-btn" @click="close">
+    <div class="win-ctl-btn" @click="close">
       <div class="bg-red-500 border-red-600" />
     </div>
   </div>

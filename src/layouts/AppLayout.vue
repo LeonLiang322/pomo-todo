@@ -33,8 +33,8 @@ onUnmounted(() => {
 
 <template>
   <div class="flex w-full h-full flex-col">
-    <header class="sticky top-0 flex h-12 items-center gap-4 border-b bg-background px-4 md:px-6 drag-enabled">
-      <nav class="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6 drag-disabled">
+    <header class="sticky top-0 flex h-12 items-center gap-2 sm:gap-4 border-b bg-background px-4 md:px-6 drag-enabled">
+      <nav class="hidden flex-col gap-2 md:gap-4 text-lg font-medium md:flex md:flex-row md:items-center md:text-sm drag-disabled">
         <div
             class="flex items-center gap-2 text-lg font-semibold md:text-base"
             @click="redirect('/dashboard')"
@@ -92,7 +92,7 @@ onUnmounted(() => {
       </div>
       <WindowCtl />
     </header>
-    <main class="px-8 h-full w-full flex items-center justify-center overflow-auto">
+    <main class="h-full w-full flex items-center justify-center overflow-auto">
       <RouterView/>
     </main>
     <!--<Toaster />-->

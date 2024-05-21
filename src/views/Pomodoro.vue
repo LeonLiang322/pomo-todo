@@ -71,14 +71,14 @@ onMounted(() => {
 </script>
 
 <template>
-  <div v-if="ready" class="text-center w-full md:w-2/3">
-    <div class="text-8xl font-black tracking-widest">
+  <div v-if="ready" class="p-8 text-center w-[500px]">
+    <div class="text-6xl sm:text-8xl font-black tracking-widest">
       <div v-if="isStarted">
         <p class="text-3xl">{{ isFocusPeriod ? '专注中' : '休息中'}}</p>
         <p class="mt-4">{{ secondsToMs(remainingTime) }}</p>
       </div>
       <div v-else>
-        <p class="text-2xl mb-1">专注</p>
+        <p class="text-xl sm:text-2xl mb-1">专注</p>
         <p>{{ focusMinutes[0] }}:00</p>
         <Slider
             class="w-full mx-auto my-4 px-2 h-2"
@@ -88,8 +88,8 @@ onMounted(() => {
             :min="1"
             :step="1"
         />
-        <p class="text-4xl my-4">+</p>
-        <p class="text-2xl mb-1">休息</p>
+        <p class="text-3xl sm:text-4xl my-4">+</p>
+        <p class="text-xl sm:text-2xl mb-1">休息</p>
         <p>{{ breakMinutes[0] }}:00</p>
         <Slider
             class="w-full mx-auto my-4 px-2 h-2"
@@ -102,7 +102,7 @@ onMounted(() => {
       </div>
     </div>
     <div class="flex items-center justify-center mt-8">
-      <Button class="w-full h-12 text-xl font-medium" v-if="!isStarted" @click="startTimer">
+      <Button class="w-full h-12 text-lg sm:text-xl font-medium" v-if="!isStarted" @click="startTimer">
         <Play class="w-6 h-6 mr-4" /> 开始
       </Button>
       <Button class="pomo-ctl-btn" v-if="!isPaused && isStarted" size="icon" @click="pauseTimer">
