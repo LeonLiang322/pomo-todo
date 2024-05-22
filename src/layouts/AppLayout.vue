@@ -7,32 +7,42 @@ import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from 
 import { Separator } from '@/components/ui/separator'
 import WindowCtl from "@/components/WindowCtl.vue";
 import routerConfig from "@/lib/routerConfig.ts";
+import { debounce } from 'lodash';
 
 const ipc = (window as any).ipcRenderer;
-const pomoStatus = ref('stopped')
+const pomoStatus = ref('stopped');
 const pomoIsFocusPeriod = ref(true);
-
 const sheet = ref(false);
+const mainHeight = ref(window.innerHeight);
+
+const updateMainHeight = () => {
+  mainHeight.value = window.innerHeight - 48;
+};
+
+const debouncedUpdateMainHeight = debounce(updateMainHeight, 200);
 
 const redirect = (path: string) => {
   router.push(path);
 };
 
 onMounted(() => {
+  updateMainHeight();
+  window.addEventListener('resize', debouncedUpdateMainHeight);
   ipc.on('pomo-update-badge', (event: any, data: any) => {
     pomoStatus.value = data.status;
     pomoIsFocusPeriod.value = data.isFocusPeriod;
   });
-})
+});
 
 onUnmounted(() => {
   ipc.removeAllListeners('pomo-update-badge');
-})
+  window.removeEventListener('resize', debouncedUpdateMainHeight);
+});
 
 </script>
 
 <template>
-  <div class="flex w-full h-full flex-col">
+  <div class="w-full h-full">
     <header class="sticky top-0 flex h-12 items-center gap-2 sm:gap-4 border-b bg-background px-4 md:px-6 drag-enabled">
       <nav class="hidden flex-col gap-2 md:gap-4 text-lg font-medium md:flex md:flex-row md:items-center md:text-sm drag-disabled">
         <div
@@ -92,13 +102,12 @@ onUnmounted(() => {
       </div>
       <WindowCtl />
     </header>
-    <main class="h-full w-full flex items-center justify-center overflow-auto">
-      <RouterView/>
+    <main class="w-full"
+          :style="{ height: mainHeight + 'px' }">
+      <RouterView />
     </main>
-    <!--<Toaster />-->
   </div>
 </template>
 
 <style scoped>
-
 </style>

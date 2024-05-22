@@ -27,6 +27,7 @@
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.10",
+    "@types/lodash": "^4.17.4",
     "@types/node": "^20.12.11",
     "@vitejs/plugin-vue": "^5.0.4",
     "autoprefixer": "^10.4.19",

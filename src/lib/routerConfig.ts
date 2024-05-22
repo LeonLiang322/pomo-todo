@@ -11,7 +11,7 @@ const routerConfig = [
     },
     {
         path: 'todo',
-        name: '计划任务',
+        name: '任务清单',
         component: () => import('@/views/Todo.vue'),
     },
     {

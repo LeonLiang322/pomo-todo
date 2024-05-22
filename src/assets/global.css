@@ -16,8 +16,8 @@
   font-style: normal;
 }
 
-html, body, #app {
-  @apply h-full m-0 p-0 overflow-hidden;
+body, html, #app {
+  @apply m-0 p-0 overflow-hidden min-w-[300px];
 }
 
 * {
@@ -60,13 +60,13 @@ html, body, #app {
 
 ::-webkit-scrollbar {
   width: 4px;
+  height: 4px;
 }
 ::-webkit-scrollbar-track {
   background: transparent; /* 轨道颜色 */
 }
 ::-webkit-scrollbar-button {
-  width: .5rem;
-  height: .5rem;
+  display: none;
 }
 ::-webkit-scrollbar-thumb {
   margin-top: 5px;

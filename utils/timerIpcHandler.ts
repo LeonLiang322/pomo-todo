@@ -7,9 +7,7 @@ let timerWorker: Worker | null = null;
 export function initTimerHandlers(win: BrowserWindow | null) {
     ipcMain.on('timer-create-worker', (event, startData) => {
         if (!timerWorker) {
-            timerWorker = new Worker(path.join(__dirname, '../worker/timerWorker.js'), { workerData: startData });
-
-            console.log('timerWorker created', startData)
+            timerWorker = new Worker(path.join(__dirname, '../workers/timerWorker.js'), { workerData: startData });
 
             timerWorker.on('message', (data: any) => {
                 switch (data.type) {

@@ -4,7 +4,7 @@ import routerConfig from "@/lib/routerConfig.ts";
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
-    redirect: '/dashboard',
+    redirect: '/pomo',
     component: () => import('@/layouts/AppLayout.vue'),
     children: [
         ...routerConfig,
