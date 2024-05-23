@@ -2,12 +2,20 @@
 import { ref, onMounted, computed } from 'vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogClose,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { ChevronRight, X, Check } from 'lucide-vue-next';
 import TaskRecord from "@/components/TaskRecord.vue";
 import TaskLists from "@/components/TaskLists.vue";
 
-const ipcRenderer = (window as any).ipcRenderer;
+const ipc = (window as any).ipcRenderer;
 const tasks = ref<Task[]>([]);
 const lists = ref<TaskList[]>([]);
 const selectedLists = ref(new Set<number>());
@@ -15,10 +23,13 @@ const expandCompleted = ref(false);
 const showAddDialog = ref(false);
 const newListTitle = ref('无标题列表');
 
+const showDeleteDialog = ref(false);
+const deleteInfo = ref({});
+
 // 获取所有任务和列表
 const fetchAllData = () => {
-  tasks.value = ipcRenderer.sendSync('db-operation', { action: 'select-all', table: 'task' });
-  lists.value = ipcRenderer.sendSync('db-operation', { action: 'select-all', table: 'list' });
+  tasks.value = ipc.sendSync('db-operation', { action: 'select-all', table: 'task' });
+  lists.value = ipc.sendSync('db-operation', { action: 'select-all', table: 'list' });
 };
 
 // 计算选中列表中的任务
@@ -40,27 +51,31 @@ const filteredCompletedTasks = computed(() => {
 
 
 const addTask = (task: Partial<Task>) => {
-  ipcRenderer.sendSync('db-operation', { action: 'insert', table: 'task', data: task });
+  ipc.sendSync('db-operation', { action: 'insert', table: 'task', data: task });
   fetchAllData();
 };
 
 const updateTask = (id: number, updatedData: any) => {
-  ipcRenderer.sendSync('db-operation', { action: 'update', table: 'task', id, data: updatedData });
+  ipc.sendSync('db-operation', { action: 'update', table: 'task', id, data: updatedData });
   fetchAllData();
+};
+
+const openDeleteDialog = (info: object) => {
+  deleteInfo.value = info;
+  showDeleteDialog.value = true;
 };
 
 const deleteTask = (id: number) => {
-  ipcRenderer.sendSync('db-operation', { action: 'delete', table: 'task', id });
+  ipc.sendSync('db-operation', { action: 'delete', table: 'task', id });
   fetchAllData();
+  showDeleteDialog.value = false;
 };
 
 const addList = (list: Partial<TaskList>) => {
-  ipcRenderer.sendSync('db-operation', { action: 'insert', table: 'list', data: list });
+  ipc.sendSync('db-operation', { action: 'insert', table: 'list', data: list });
   fetchAllData();
   showAddDialog.value = false;
 };
-
-onMounted(fetchAllData);
 
 const updateComplete = (id: number, completed: boolean) => {
   updateTask(id, { completed: completed ? 1 : 0 });
@@ -79,7 +94,13 @@ const toggleListSelection = (listId: number) => {
   } else {
     selectedLists.value.add(listId);
   }
+  ipc.send('config-store-set', { 'todoSelectedLists': Array.from(selectedLists.value) });
 };
+
+onMounted(() => {
+  fetchAllData();
+  selectedLists.value = new Set(ipc.sendSync('config-store-get', 'todoSelectedLists') || []);
+});
 </script>
 
 <template>
@@ -89,7 +110,7 @@ const toggleListSelection = (listId: number) => {
       <div class="w-full h-full px-8 pt-4 pb-20 overflow-auto">
         <ul>
           <li v-for="task in filteredTodoTasks" :key="task.id">
-            <TaskRecord :task="task" :lists="lists" @delete="deleteTask" @changeList="changeTaskList" @complete="updateComplete"/>
+            <TaskRecord :task="task" :lists="lists" @delete="openDeleteDialog" @changeList="changeTaskList" @complete="updateComplete"/>
             <!--<select @change="event => changeTaskList(task, Number((event.target as HTMLSelectElement).value))" :value="task.list_id">-->
             <!--  <option v-for="list in lists" :value="list.id" :key="list.id">{{ list.name }}</option>-->
             <!--</select>-->
@@ -97,13 +118,14 @@ const toggleListSelection = (listId: number) => {
         </ul>
         <Button
             class="flex gap-2 items-center justify-between border-2 border-green-500 p-1 rounded-lg"
+            :class="{ 'bg-green-500 text-white': expandCompleted }"
             variant="outline"
             @click="expandCompleted = !expandCompleted"
         >
-          <ChevronRight class="h-5 w-5 text-green-500 transform transition-transform duration-300"
+          <ChevronRight class="h-5 w-5 transform transition-transform duration-300"
                         :class="{ 'rotate-90': expandCompleted }" />
           <span>已完成</span>
-          <span class="text-green-500 mr-2 font-black">{{ filteredCompletedTasks.length }}</span>
+          <span class="mr-2 font-black">{{ filteredCompletedTasks.length }}</span>
         </Button>
         <ul v-if="expandCompleted">
           <li v-for="task in filteredCompletedTasks" :key="task.id">
@@ -144,11 +166,27 @@ const toggleListSelection = (listId: number) => {
             v-model="newListTitle"
             @keyup.enter="addList({ name: newListTitle })"
         />
-        <Button class="h-12 w-12 border-green-500 border-2" variant="outline" size="icon">
-          <Check class="h-8 w-8 text-green-500" @click="showAddDialog=false" />
+        <Button class="h-12 w-12 hover:text-green-500" variant="ghost" size="icon">
+          <Check class="h-6 w-6" @click="showAddDialog=false" />
         </Button>
       </div>
-
+    </DialogContent>
+  </Dialog>
+  <Dialog v-model:open="showDeleteDialog">
+    <DialogContent>
+      <DialogHeader>
+        <DialogTitle class="ml-1">删除确认</DialogTitle>
+        <DialogDescription />
+      </DialogHeader>
+      <div class="flex items-center justify-center">
+        <p>{{ deleteInfo.msg }}</p>
+      </div>
+      <DialogFooter class="sm:justify-end">
+        <DialogClose as-child>
+          <Button variant="secondary">取消</Button>
+        </DialogClose>
+        <Button variant="destructive" @click="deleteTask(deleteInfo.id)">删除</Button>
+      </DialogFooter>
     </DialogContent>
   </Dialog>
 </template>

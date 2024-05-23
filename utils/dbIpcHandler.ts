@@ -18,7 +18,7 @@ function initDataBase() {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             description TEXT NOT NULL,
             note TEXT DEFAULT NULL,
-            completed BOOLEAN DEFAULT 1,
+            completed BOOLEAN DEFAULT 0,
             create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             update_time TIMESTAMP DEFAULT NULL,
             due_time TIMESTAMP DEFAULT NULL,

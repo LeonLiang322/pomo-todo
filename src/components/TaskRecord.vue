@@ -10,7 +10,7 @@ const props = defineProps<{
 const emits = defineEmits(['delete', 'changeList', 'complete']);
 
 const handleDeleteTask = () => {
-  emits('delete', props.task.id);
+  emits('delete', { msg: '确定要删除任务 ' + props.task.description + ' 吗？', id: props.task.id });
 };
 
 const handleCompleteTask = () => {
@@ -22,7 +22,8 @@ const handleCompleteTask = () => {
   <TaskMenu>
     <template #trigger>
       <div
-          class="flex min-w-68 items-center justify-between my-2 p-2 border-2 border-gray-400 rounded-lg"
+          class="flex min-w-68 items-center justify-between my-2 p-2 border-2 border-gray-400 rounded-lg cursor-pointer"
+          @click="console.log('click')"
       >
         <div class="flex items-center pl-2" >
           <CheckCheck v-if="task.completed" class="h-5 w-5 mr-2 text-green-500" />

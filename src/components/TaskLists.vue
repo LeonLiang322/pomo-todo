@@ -24,7 +24,8 @@ const addNewList = () => {
     <Badge
         class="sticky top-0 w-full p-2 cursor-pointer border-green-500 border-2 bg-white hover:bg-green-500 hover:text-white"
         variant="outline"
-        @click="addNewList">
+        @click="addNewList"
+    >
       <div>
         <span class="mr-2">+</span>
         <span>新建列表</span>
@@ -33,7 +34,8 @@ const addNewList = () => {
     <Badge
         class="p-2 cursor-pointer border-2 border-gray-400"
         :variant="selectedLists.has(lists[0].id) ? 'default' : 'secondary'"
-        @click="toggleListSelection(lists[0].id)">
+        @click="toggleListSelection(lists[0].id)"
+    >
       <div>
         <span class="mr-2 text-green-500">{{ lists[0].todo_count }}</span>
         <span>默认</span>
@@ -44,7 +46,8 @@ const addNewList = () => {
         v-for="list in lists.slice(1)"
         :variant="selectedLists.has(list.id) ? 'default' : 'secondary'"
         :key="list.id"
-        @click="toggleListSelection(list.id)">
+        @click="toggleListSelection(list.id)"
+    >
       <div class="flex items-center">
         <span class="mr-2 text-green-500">{{ list.todo_count }}</span>
         <span>{{ list.name }}</span>
