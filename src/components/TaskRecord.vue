@@ -31,13 +31,13 @@ const handleCompleteTask = () => {
         </div>
         <div class=" sm:flex gap-1 ml-2 ">
           <Button variant="ghost" size="icon" @click="handleDeleteTask">
-            <Trash2 class="h-5 w-5 text-red-500" />
+            <Trash2 class="size-5 text-red-500" />
           </Button>
           <Button v-if="task.completed" variant="ghost" size="icon" @click="handleCompleteTask">
-            <Undo class="h-5 w-5 text-yellow-500" />
+            <Undo class="size-5 text-yellow-500" />
           </Button>
           <Button v-else variant="ghost" size="icon" @click="handleCompleteTask">
-            <CircleCheckBig class="h-5 w-5 text-green-500" />
+            <CircleCheckBig class="size-5 text-green-500" />
           </Button>
         </div>
       </div>

@@ -1,7 +1,34 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input'
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  DateFormatter,
+  type DateValue,
+  getLocalTimeZone,
+  today,
+} from '@internationalized/date'
+
+import { CalendarIcon } from '@radix-icons/vue'
+import { Calendar } from '@/components/ui/calendar'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { cn } from '@/lib/utils'
+
+const df = new DateFormatter('en-US', {
+  dateStyle: 'long',
+})
+
+const items = [
+  { value: 0, label: 'Today' },
+  { value: 1, label: 'Tomorrow' },
+  { value: 3, label: 'In 3 days' },
+  { value: 7, label: 'In a week' },
+]
+
+const value = ref<DateValue>()
 import {
   Dialog,
   DialogContent,
@@ -11,9 +38,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { ChevronRight, X, Check } from 'lucide-vue-next';
+import { ChevronRight, Check, Cross, Bolt } from 'lucide-vue-next';
 import TaskRecord from "@/components/TaskRecord.vue";
 import TaskLists from "@/components/TaskLists.vue";
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 
 const ipc = (window as any).ipcRenderer;
 const tasks = ref<Task[]>([]);
@@ -22,6 +50,9 @@ const selectedLists = ref(new Set<number>());
 const expandCompleted = ref(false);
 const showAddDialog = ref(false);
 const newListTitle = ref('无标题列表');
+const newTaskInfo = ref({
+  description: '',
+});
 
 const showDeleteDialog = ref(false);
 const deleteInfo = ref({});
@@ -50,8 +81,11 @@ const filteredCompletedTasks = computed(() => {
 });
 
 
-const addTask = (task: Partial<Task>) => {
-  ipc.sendSync('db-operation', { action: 'insert', table: 'task', data: task });
+const addTask = () => {
+  const newTask: Partial<Task> = {
+    description: newTaskInfo.value.description,
+  };
+  ipc.sendSync('db-operation', { action: 'insert', table: 'task', data: newTask });
   fetchAllData();
 };
 
@@ -117,40 +151,91 @@ onMounted(() => {
           </li>
         </ul>
         <Button
-            class="flex gap-2 items-center justify-between border-2 border-green-500 p-1 rounded-lg"
-            :class="{ 'bg-green-500 text-white': expandCompleted }"
+            :class="cn('flex gap-2 items-center justify-between border-2 border-green-500 p-1 rounded-lg',
+              expandCompleted && 'bg-green-500 text-white')"
             variant="outline"
             @click="expandCompleted = !expandCompleted"
         >
-          <ChevronRight class="h-5 w-5 transform transition-transform duration-300"
-                        :class="{ 'rotate-90': expandCompleted }" />
+          <ChevronRight :class="cn('h-5 w-5 transform transition-transform duration-300', expandCompleted && 'rotate-90')" />
           <span>已完成</span>
-          <span class="mr-2 font-black">{{ filteredCompletedTasks.length }}</span>
+          <span class="mr-2 font-black" :class="cn('mr-2 font-black', !expandCompleted && 'text-green-500')">
+            {{ filteredCompletedTasks.length }}
+          </span>
         </Button>
         <ul v-if="expandCompleted">
           <li v-for="task in filteredCompletedTasks" :key="task.id">
             <TaskRecord :task="task" :lists="lists" @delete="deleteTask" @changeList="changeTaskList" @complete="updateComplete"/>
           </li>
         </ul>
-        <button @click="addTask({ description: 'New Task' })">Add Task</button>
       </div>
       <div class="absolute inset-x-0 bottom-0 w-full px-4">
-        <div class="h-full w-full bg-white/50 backdrop-blur-sm pb-4">
-          <Input
-              class="w-full h-14 bg-white border-black border-2"
-              placeholder="添加任务"
-              @enter="addTask({ description: $event })"
-          />
+        <div class="h-full w-full bg-white/50 backdrop-blur-sm pb-4 relative">
+          <div class="relative w-full">
+            <Input
+                class="w-full pr-24 h-14 bg-white border-black border-2"
+                v-model="newTaskInfo.description"
+                placeholder="添加任务"
+                @keyup.enter="addTask"
+            />
+            <div class="flex items-center justify-center gap-1 absolute end-0 inset-y-0 pr-3">
+              <Button variant="ghost" size="icon">
+                <Bolt class="size-5" />
+              </Button>
+              <Button variant="ghost" size="icon" @click="addTask">
+                <Cross class="size-5" />
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
     <div class="border-l-2 p-4 pt-6 w-[240px] md:w-[360px] hidden sm:block overflow-auto">
-      <div>
-        <TaskLists
-            :lists="lists"
-            :selectedLists="selectedLists"
-            @toggle="toggleListSelection"
-            @add="showAddDialog=true" />
+      <TaskLists
+          :lists="lists"
+          :selectedLists="selectedLists"
+          @toggle="toggleListSelection"
+          @add="showAddDialog=true" />
+      <div class="border">
+        <div class="grid w-full gap-1.5">
+          <Textarea id="message" placeholder="添加备注" />
+          {{ value }}
+        </div>
+        <Popover>
+          <PopoverTrigger as-child>
+            <Button
+                variant="outline"
+                :class="cn(
+          'w-[280px] justify-start text-left font-normal',
+          !value && 'text-muted-foreground',
+        )"
+            >
+              <CalendarIcon class="mr-2 h-4 w-4" />
+              {{ value ? df.format(value.toDate(getLocalTimeZone())) : "Pick a date" }}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent class="flex w-auto flex-col gap-y-2 p-2">
+        <!--    <Select-->
+        <!--        @update:model-value="(v) => {-->
+        <!--  if (!v) return;-->
+        <!--  value = today(getLocalTimeZone()).add({ days: Number(v) });-->
+        <!--}"-->
+        <!--    >-->
+        <!--      <SelectTrigger>-->
+        <!--        <SelectValue placeholder="Select" />-->
+        <!--      </SelectTrigger>-->
+        <!--      <SelectContent>-->
+        <!--        <SelectItem v-for="item in items" :key="item.value" :value="item.value.toString()">-->
+        <!--          {{ item.label }}-->
+        <!--        </SelectItem>-->
+        <!--      </SelectContent>-->
+        <!--    </Select>-->
+
+            <Calendar v-model="value" />
+          </PopoverContent>
+        </Popover>
+        <p>到期时间</p>
+        <p>列表</p>
+        <p>置顶</p>
       </div>
     </div>
   </div>
@@ -166,8 +251,8 @@ onMounted(() => {
             v-model="newListTitle"
             @keyup.enter="addList({ name: newListTitle })"
         />
-        <Button class="h-12 w-12 hover:text-green-500" variant="ghost" size="icon">
-          <Check class="h-6 w-6" @click="showAddDialog=false" />
+        <Button class="size-12 hover:text-green-500" variant="ghost" size="icon">
+          <Check class="size-6" @click="showAddDialog=false" />
         </Button>
       </div>
     </DialogContent>
@@ -178,10 +263,10 @@ onMounted(() => {
         <DialogTitle class="ml-1">删除确认</DialogTitle>
         <DialogDescription />
       </DialogHeader>
-      <div class="flex items-center justify-center">
+      <div class="text-center">
         <p>{{ deleteInfo.msg }}</p>
       </div>
-      <DialogFooter class="sm:justify-end">
+      <DialogFooter class="justify-end">
         <DialogClose as-child>
           <Button variant="secondary">取消</Button>
         </DialogClose>
