@@ -31,4 +31,5 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
     const [channel, ...omit] = args
     return ipcRenderer.invoke(channel, ...omit)
   },
+  onContextMenuCommand: (callback: any) => ipcRenderer.on('context-menu-command', callback)
 })

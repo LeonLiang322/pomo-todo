@@ -55,6 +55,14 @@ function initDataBase() {
                 complete_count = CASE WHEN OLD.completed = 1 THEN complete_count - 1 ELSE complete_count END
             WHERE id = OLD.list_id;
         END;
+        
+        -- 删除列表时删除列表下的任务
+        CREATE TRIGGER IF NOT EXISTS after_list_delete
+        AFTER DELETE ON list
+        FOR EACH ROW
+        BEGIN
+            DELETE FROM task WHERE list_id = OLD.id;
+        END;
 
         -- 更新任务的completed属性时调整complete_count和todo_count
         CREATE TRIGGER IF NOT EXISTS after_task_update
