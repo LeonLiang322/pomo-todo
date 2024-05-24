@@ -10,9 +10,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { Check, Trash2 } from 'lucide-vue-next';
-import { ref } from "vue";
+import { Check, Trash2, TriangleAlert } from 'lucide-vue-next';
+import { onMounted, ref } from "vue";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 
 defineProps<{
   lists: TaskList[];
@@ -24,6 +25,8 @@ const showDeleteDialog = ref(false);
 const showAddDialog = ref(false);
 const deleteInfo = ref<TaskList | null>();
 const newListTitle = ref('无标题列表');
+const showWarning = ref(true);
+const hideWarning = ref(false);
 
 const handleShowDelete = (task: TaskList) => {
   deleteInfo.value = task;
@@ -31,6 +34,9 @@ const handleShowDelete = (task: TaskList) => {
 };
 
 const deleteList = () => {
+  if (hideWarning.value) {
+    (window as any).ipcRenderer.send('config-store-set', { 'hideDeleteListWarning': true });
+  }
   emit('delete', deleteInfo.value?.id);
   showDeleteDialog.value = false;
 };
@@ -44,14 +50,19 @@ const handleAddNewList = () => {
   showAddDialog.value = false;
   newListTitle.value = '无标题列表';
 };
+
+onMounted(() => {
+  showWarning.value = !(window as any).ipcRenderer.sendSync('config-store-get', 'hideDeleteListWarning');
+});
 </script>
 
 <template>
   <div
-      class="grid gap-2 p-2 mb-4 border-2 rounded-lg max-h-[300px] overflow-auto"
+      class="grid gap-2 pr-2 mb-4 max-h-[300px] overflow-auto"
       v-if="lists && lists.length > 0">
     <Badge
-        class="px-4 py-1 sticky top-0 w-full cursor-pointer border-green-500 border-2 bg-white hover:bg-green-500 hover:text-white"
+        class="px-4 py-1 sticky top-0 w-full cursor-pointer shadow-lg border border-green-500
+          bg-white hover:bg-green-500 hover:text-white z-10"
         variant="outline"
         @click="showAddDialog=true"
     >
@@ -61,9 +72,9 @@ const handleAddNewList = () => {
       </div>
     </Badge>
     <Badge
-        class="pl-4 cursor-pointer border-2 border-gray-400"
+        class="pl-4 cursor-pointer shadow-lg border border-gray-400"
         v-for="list in lists"
-        :variant="selectedLists.has(list.id) ? 'default' : 'secondary'"
+        :variant="selectedLists.has(list.id) ? 'default' : 'outline'"
         :key="list.id"
         @click="toggleListSelection(list.id)"
     >
@@ -88,8 +99,15 @@ const handleAddNewList = () => {
         <DialogTitle class="ml-1">删除确认</DialogTitle>
         <DialogDescription />
       </DialogHeader>
-      <div class="text-center">
-        <p>确定要删除列表 {{ deleteInfo?.name }} 吗</p>
+      <div class="flex flex-col gap-3 items-center justify-center">
+        <p>确定要删除列表 <span class="font-bold">{{ deleteInfo?.name }}</span> 吗?</p>
+
+        <div v-if="showWarning" class="flex items-center italic">
+          <TriangleAlert class="size-4 mr-2 text-red-500" />
+          <p class="mr-4 text-red-500">列表中的任务将被全部删除</p>
+          <Checkbox id="terms" :checked="hideWarning" @update:checked="hideWarning = !hideWarning" />
+          <label class="ml-1 text-xs" for="terms">不再显示红字提醒</label>
+        </div>
       </div>
       <DialogFooter class="justify-end">
         <DialogClose as-child>

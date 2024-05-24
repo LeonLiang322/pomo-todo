@@ -1,5 +1,8 @@
 import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
+import dayjs from 'dayjs'
+import 'dayjs/locale/zh-cn.js'
+dayjs.locale('zh-cn')
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -11,3 +14,13 @@ export function secondsToMs(s: number) {
   const seconds = s % 60;
   return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 }
+
+export function formatDate(date: Date | string, format = 'YYYY年MM月DD日 HH:mm') {
+  return dayjs(date).format(format)
+}
+
+export function getCurrentTime() {
+  return dayjs().format('YYYY-MM-DD HH:mm:ss')
+}
+
+

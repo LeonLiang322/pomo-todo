@@ -18,10 +18,10 @@ function initDataBase() {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             description TEXT NOT NULL,
             note TEXT DEFAULT NULL,
+            due_date DATE DEFAULT NULL,
             completed BOOLEAN DEFAULT 0,
             create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             update_time TIMESTAMP DEFAULT NULL,
-            due_time TIMESTAMP DEFAULT NULL,
             finish_time TIMESTAMP DEFAULT NULL,
             list_id INTEGER NOT NULL DEFAULT 1,
             pinned BOOLEAN DEFAULT 0
@@ -93,7 +93,7 @@ function initDataBase() {
     `);
 
     ipcMain.on('db-operation', (event, args) => {
-        const { action, table, data, id } = args;
+        const { action, table, data, id, condition } = args;
         let stmt, result;
 
         switch (action) {
@@ -118,7 +118,7 @@ function initDataBase() {
                 result = stmt.get(id);
                 break;
             case 'select-all':
-                stmt = db.prepare(`SELECT * FROM ${table}`);
+                stmt = db.prepare(`SELECT * FROM ${table} ${condition}`);
                 result = stmt.all();
                 break;
             default:
@@ -127,6 +127,7 @@ function initDataBase() {
 
         event.returnValue = result;
     });
+
 }
 
 export default initDataBase;

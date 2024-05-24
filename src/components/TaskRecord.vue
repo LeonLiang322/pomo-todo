@@ -7,7 +7,11 @@ const props = defineProps<{
   task: Task;
 }>();
 
-const emits = defineEmits(['delete', 'complete', 'pin']);
+const emits = defineEmits(['select', 'delete', 'complete', 'pin']);
+
+const handleSelect = () => {
+  emits('select', props.task);
+};
 
 const handleDelete = () => {
   emits('delete', { msg: '确定要删除任务 ' + props.task.description + ' 吗？', id: props.task.id });
@@ -23,8 +27,9 @@ const handleComplete = () => {
 </script>
 
 <template>
-  <div class="flex items-center justify-between min-w-68 my-2 p-2 border-2 border-gray-400 rounded-lg cursor-pointer"
-       :class="!task.completed && task.pinned ? 'order-first' : ''"
+  <div
+      class="flex items-center justify-between min-w-68 shadow-lg p-2 border border-gray-400 rounded-lg cursor-pointer"
+      @click="handleSelect"
   >
     <div class="flex items-center" >
       <CheckCheck v-if="task.completed" class="size-5 ml-2 mr-3 text-green-500" />

@@ -5,7 +5,7 @@ interface Task {
     completed: boolean;
     create_time: string;
     update_time: string;
-    due_time: string;
+    due_date: string;
     finish_time: string;
     list_id: number;
     pinned: boolean;
