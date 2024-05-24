@@ -15,12 +15,20 @@ export function secondsToMs(s: number) {
   return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 }
 
-export function formatDate(date: Date | string, format = 'YYYY年MM月DD日 HH:mm') {
+export function formatDate(date: Date | string, format = 'YYYY年MM月DD日') {
   return dayjs(date).format(format)
+}
+
+export function formatTime(time: Date | string, format = 'YYYY年MM月DD日 HH:mm') {
+    return dayjs(time).format(format)
+
 }
 
 export function getCurrentTime() {
   return dayjs().format('YYYY-MM-DD HH:mm:ss')
 }
 
+export function getDateFromToday(add: number) {
+  return dayjs().add(add, 'day').format('YYYY-MM-DD')
+}
 

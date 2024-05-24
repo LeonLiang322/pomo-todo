@@ -7,21 +7,15 @@ import { Textarea } from '@/components/ui/textarea';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { DateFormatter, type DateValue, getLocalTimeZone, isEqualDay, today } from '@internationalized/date';
-import { cn, formatDate, getCurrentTime } from '@/lib/utils';
+import { cn, getCurrentTime } from '@/lib/utils';
 import { ChevronRight, List, Ban, Cross, Bolt, X, CalendarDays, Tag } from 'lucide-vue-next';
 import TaskRecord from "@/components/TaskRecord.vue";
 import TaskLists from "@/components/TaskLists.vue";
-
-interface DeleteInfo {
-  msg: string;
-  id: number | null;
-}
 
 const ipc = (window as any).ipcRenderer;
 const incompleteTasks = ref<Task[]>([]);
 const completedTasks = ref<Task[]>([]);
 const lists = ref<TaskList[]>([]);
-const deleteInfo = ref<DeleteInfo>();
 
 const selectedLists = ref(new Set<number>());
 const completeExpanded = ref(false);
@@ -36,12 +30,12 @@ const taskIndex = ref(0);
 const taskDescription = ref('');
 const taskNote = ref('');
 const taskDueDate = ref<DateValue>();
-const taskCreateTime = ref('');
-const taskUpdateTime = ref('');
-const taskFinishTime = ref('');
+const taskCreateTime = ref();
+const taskUpdateTime = ref();
+const taskFinishTime = ref();
 const taskBelongList = ref('1');
 
-const df = new DateFormatter('en-US', {
+const df = new DateFormatter('zh-cn', {
   dateStyle: 'long',
 });
 
@@ -73,8 +67,6 @@ const cleanTaskInfo = () => {
   taskDescription.value = '';
   taskNote.value = '';
   taskCreateTime.value = '';
-  taskUpdateTime.value = '';
-  taskFinishTime.value = '';
   taskBelongList.value = '1';
 };
 
@@ -95,7 +87,7 @@ const cancelNewTask = () => {
 
 const updateTask = (id: number, updatedData: any) => {
   console.log('updating')
-  if (updatedData.description.length === 0) return;
+  if (updatedData.description?.length === 0) return;
   updatedData.update_time = getCurrentTime();
   ipc.sendSync('db-operation', { action: 'update', table: 'task', id, data: updatedData });
   fetchAllData();
@@ -114,15 +106,7 @@ const handleTaskSelect = (task: Task) => {
   taskDescription.value = task.description;
   taskNote.value = task.note;
   taskCreateTime.value = task.create_time;
-  taskUpdateTime.value = task.update_time;
-  taskFinishTime.value = task.finish_time ? task.finish_time : '';
   taskBelongList.value = task.list_id + '';
-};
-
-
-const openDeleteDialog = (info: DeleteInfo) => {
-  deleteInfo.value = info;
-  showDeleteDialog.value = true;
 };
 
 const deleteTask = (id: number) => {
@@ -260,6 +244,7 @@ onMounted(() => {
       </div>
     </div>
     <div class="border-l-2 p-4 pt-6 w-[240px] md:w-[360px] hidden sm:block overflow-auto">
+      {{ taskCreateTime }}
       <TaskLists
           :lists="lists"
           :selectedLists="selectedLists"
@@ -267,10 +252,8 @@ onMounted(() => {
           @add="addList"
           @delete="deleteList"
       />
-      {{editTemp}}
       <transition name="fade">
-        <!--TODO: taskDescription删除到空时就消失了-->
-        <div class="grid gap-2 border-t-2 py-4" v-if="taskDescription.length > 0">
+        <div class="grid gap-2 border-t-2 mt-4 py-4" v-if="taskDescription.length > 0">
           <div class="flex items-center">
             <Tag class="size-4 mr-3" />
             <Input
@@ -284,7 +267,6 @@ onMounted(() => {
                 })"
             />
           </div>
-          <!--Todo: 修改日期格式-->
           <div class="flex items-center">
             <CalendarDays class="size-4 mr-3" />
             <Popover v-model:open="showDueDatePopover">
@@ -303,7 +285,7 @@ onMounted(() => {
                     class="w-full justify-start"
                     @click="saveDueDate(today(getLocalTimeZone()))"
                 >
-                  今天截止
+                  <CalendarDays class="mr-2 h-4 w-4" />今天截止
                 </Button>
                 <Button
                     v-if="!taskDueDate || !isEqualDay(taskDueDate, today(getLocalTimeZone()).add({ days: 1 }))"
@@ -360,20 +342,19 @@ onMounted(() => {
               })"
           />
           <p
-              v-if="taskCreateTime.length > 0"
               class="text-xs text-gray-500 italic text-end">
-            创建于 {{ formatDate(taskCreateTime) }}
+            创建于 {{ taskCreateTime }}
           </p>
-          <p
-              v-if="taskUpdateTime?.length > 0"
-              class="text-xs text-gray-500 italic text-end">
-            更新于 {{ formatDate(taskUpdateTime) }}
-          </p>
-          <p
-              v-if="taskFinishTime?.length > 0"
-              class="text-xs text-gray-500 italic text-end">
-            完成于 {{ formatDate(taskFinishTime) }}
-          </p>
+          <!--<p-->
+
+          <!--    class="text-xs text-gray-500 italic text-end">-->
+          <!--  更新于 {{ df2.format(taskUpdateTime) }}-->
+          <!--</p>-->
+          <!--<p-->
+
+          <!--    class="text-xs text-gray-500 italic text-end">-->
+          <!--  完成于 {{ df2.format(taskFinishTime) }}-->
+          <!--</p>-->
         </div>
       </transition>
     </div>
