@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from "vue";
 import router from "@/router";
-import { Menu, Package2, Timer, Pause, FolderSync } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { Separator } from '@/components/ui/separator'
+import { PanelLeftOpen, Package2, Timer, Pause, FolderSync } from 'lucide-vue-next'
 import WindowCtl from "@/components/WindowCtl.vue";
 import routerConfig from "@/lib/routerConfig.ts";
 import { debounce } from 'lodash';
@@ -63,7 +63,7 @@ onUnmounted(() => {
                 size="icon"
                 class="shrink-0 sm:hidden drag-disabled"
             >
-              <Menu class="size-5" />
+              <PanelLeftOpen class="size-5" />
               <span class="sr-only">Toggle navigation menu</span>
             </Button>
           </SheetTrigger>
@@ -84,6 +84,9 @@ onUnmounted(() => {
         </Sheet>
         <Separator class="ml-4 mr-2 hidden sm:block" orientation="vertical" />
         <div class="toolbar">
+          <Button variant="ghost" size="icon" @click="">
+            <FolderSync class="h-5 w-5" />
+          </Button>
           <Button v-if="pomoStatus !== 'stopped'" variant="ghost" size="icon" @click="redirect('pomo')">
           <span v-if="pomoStatus === 'started'">
             <Timer
@@ -96,9 +99,6 @@ onUnmounted(() => {
             />
           </span>
             <Pause class="h-5 w-5 text-red-500" v-if="pomoStatus === 'paused'"/>
-          </Button>
-          <Button variant="ghost" size="icon" @click="">
-            <FolderSync class="h-5 w-5 stroke-1" />
           </Button>
         </div>
 

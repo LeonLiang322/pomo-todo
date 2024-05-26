@@ -6,12 +6,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger
-} from '@/components/ui/tooltip'
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from '@/components/ui/drawer'
 import {
   parseDate,
   DateFormatter,
@@ -21,9 +26,10 @@ import {
   today
 } from '@internationalized/date';
 import { cn, getCurrentTime } from '@/lib/utils';
-import { ChevronRight, List, Ban, Cross, Check, X, CalendarDays, Tag } from 'lucide-vue-next';
+import { ChevronRight, List, Ban, Cross, Check, X, CalendarDays, Tag, ListTodo } from 'lucide-vue-next';
 import TaskRecord from "@/components/TaskRecord.vue";
 import TaskLists from "@/components/TaskLists.vue";
+import TaskDetail from "@/components/TaskDetail.vue";
 
 const ipc = (window as any).ipcRenderer;
 const incompleteTasks = ref<Task[]>([]);
@@ -37,7 +43,7 @@ const showDeleteDialog = ref(false);
 const showDueDatePopover = ref(false);
 
 const newTaskDescription = ref('');
-const editTemp = ref<any>();
+const editTemp = ref();
 
 const taskIndex = ref(0);
 const taskDescription = ref('');
@@ -200,47 +206,73 @@ onMounted(() => {
 <template>
   <div class="flex h-full relative">
     <div class="flex-1 relative">
-      <div class="w-full h-full px-4 sm:px-8 pt-4 pb-20 overflow-auto">
-        <div class="grid gap-2 mb-4">
-          <TaskRecord
-              :class="taskIndex === task.id ? 'border-2 border-blue-500' : 'border'"
-              v-for="task in filteredIncompleteTasks"
-              :key="task.id"
-              :task="task"
-              :lists="lists"
-              @select="handleTaskSelect"
-              @complete="updateComplete"
-              @delete="deleteTask"
-              @pin="pinTask"
-          />
+      <div class="w-full h-full pb-20 overflow-auto">
+        <div class="flex items-center gap-2 sm:hidden px-8 sticky top-0 h-14 w-full bg-white/40 backdrop-blur-sm">
+          <span class="text-xl font-bold">任务清单</span>
+          <Drawer>
+            <DrawerTrigger as-child>
+              <Button variant="ghost" size="icon">
+                <ListTodo class="size-5" />
+              </Button>
+            </DrawerTrigger>
+            <DrawerContent>
+              <DrawerHeader class="hidden">
+                <DrawerTitle>Move Goal</DrawerTitle>
+                <DrawerDescription>aaa</DrawerDescription>
+              </DrawerHeader>
+              <div class="pl-4 pr-2 max-h-[200px] overflow-auto">
+                <TaskLists
+                    :lists="lists"
+                    :selectedLists="selectedLists"
+                    @toggle="toggleListSelection"
+                    @add="addList"
+                    @delete="deleteList"
+                />
+              </div>
+            </DrawerContent>
+          </Drawer>
         </div>
-        <Button
-            :class="cn('w-28 flex gap-2 items-center justify-between border-2 border-green-500 p-1 rounded-lg',
-            completeExpanded && 'bg-green-500 text-white')"
-            variant="outline"
-            @click="handleExpandCompleted"
-        >
-          <ChevronRight :class="cn('h-5 w-5 transform transition-transform duration-300', completeExpanded && 'rotate-90')" />
-          <span>已完成</span>
-          <span class="mr-2 font-black" :class="cn('mr-2 font-black', !completeExpanded && 'text-green-500')">
-            {{ filteredCompletedTasks.length }}
-          </span>
-        </Button>
-        <transition name="fade">
-          <div class="grid gap-2 mt-2" v-if="completeExpanded">
+        <div class="px-4 sm:px-8">
+          <div class="grid gap-2 my-4">
             <TaskRecord
-                :class="taskIndex === task.id ? 'border-2 border-green-500' : 'border'"
-                v-for="task in filteredCompletedTasks"
+                :class="taskIndex === task.id ? 'border-2 border-blue-500' : 'border'"
+                v-for="task in filteredIncompleteTasks"
                 :key="task.id"
                 :task="task"
                 :lists="lists"
                 @select="handleTaskSelect"
                 @complete="updateComplete"
                 @delete="deleteTask"
+                @pin="pinTask"
             />
           </div>
-        </transition>
-
+          <Button
+              :class="cn('w-28 flex gap-2 items-center justify-between border-2 border-green-500 p-1 rounded-lg',
+            completeExpanded && 'bg-green-500 text-white')"
+              variant="outline"
+              @click="handleExpandCompleted"
+          >
+            <ChevronRight :class="cn('h-5 w-5 transform transition-transform duration-300', completeExpanded && 'rotate-90')" />
+            <span>已完成</span>
+            <span class="mr-2 font-black" :class="cn('mr-2 font-black', !completeExpanded && 'text-green-500')">
+            {{ filteredCompletedTasks.length }}
+          </span>
+          </Button>
+          <transition name="fade">
+            <div class="grid gap-2 mt-2" v-if="completeExpanded">
+              <TaskRecord
+                  :class="taskIndex === task.id ? 'border-2 border-green-500' : 'border'"
+                  v-for="task in filteredCompletedTasks"
+                  :key="task.id"
+                  :task="task"
+                  :lists="lists"
+                  @select="handleTaskSelect"
+                  @complete="updateComplete"
+                  @delete="deleteTask"
+              />
+            </div>
+          </transition>
+        </div>
       </div>
       <div class="absolute inset-x-0 bottom-0 w-full px-4">
         <div class="h-full w-full bg-white/50 backdrop-blur-sm pb-4 relative">
@@ -269,13 +301,15 @@ onMounted(() => {
       </div>
     </div>
     <div class="border-l-2 p-4 pt-6 w-[240px] md:w-[360px] hidden sm:block overflow-auto">
-      <TaskLists
-          :lists="lists"
-          :selectedLists="selectedLists"
-          @toggle="toggleListSelection"
-          @add="addList"
-          @delete="deleteList"
-      />
+      <div class="max-h-[290px] overflow-auto">
+        <TaskLists
+            :lists="lists"
+            :selectedLists="selectedLists"
+            @toggle="toggleListSelection"
+            @add="addList"
+            @delete="deleteList"
+        />
+      </div>
       <transition name="fade">
         <div v-if="taskIndex">
           <div class="grid gap-2 border-t-2 mt-4 py-4" >
@@ -380,6 +414,7 @@ onMounted(() => {
         </div>
       </transition>
     </div>
+
   </div>
 </template>
 

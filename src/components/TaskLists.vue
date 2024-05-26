@@ -58,8 +58,9 @@ onMounted(() => {
 
 <template>
   <div
-      class="grid gap-2 pr-2 pb-4 max-h-[290px] overflow-auto"
-      v-if="lists && lists.length > 0">
+      class="grid gap-2 pr-2 pb-4"
+      v-if="lists && lists.length > 0"
+  >
     <Badge
         class="px-4 py-1 sticky top-0 w-full cursor-pointer shadow-lg border border-green-500
           bg-white hover:bg-green-500 hover:text-white z-10 rounded-t-none"
