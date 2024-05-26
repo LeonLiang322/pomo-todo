@@ -43,47 +43,48 @@ onUnmounted(() => {
 
 <template>
   <div class="w-full h-full">
-    <header class="sticky top-0 flex h-12 items-center gap-2 sm:gap-4 border-b bg-background px-4 md:px-6 drag-enabled">
-      <nav class="hidden flex-col gap-2 md:gap-4 text-lg font-medium md:flex md:flex-row md:items-center md:text-sm drag-disabled">
-        <div
-            class="flex items-center gap-2 text-lg font-semibold md:text-base"
-            @click="redirect('/dashboard')"
-        >
-          <Package2 class="h-5 w-5" />
-        </div>
-        <div class="menu-item" v-for="route in routerConfig" @click="redirect(route.path)">
-          {{ route.name }}
-        </div>
-      </nav>
-      <Sheet v-model:open="sheet">
-        <SheetTrigger as-child>
-          <Button
-              variant="ghost"
-              size="icon"
-              class="shrink-0 md:hidden drag-disabled"
+    <header class="sticky top-0 flex justify-between h-12 items-center border-b-2 drag-enabled">
+      <nav class="flex items-center gap-2 h-full px-4 text-sm drag-disabled">
+        <div class="hidden sm:flex gap-4 ">
+          <div
+              class="flex items-center gap-2 text-lg font-semibold md:text-base"
+              @click="redirect('/dashboard')"
           >
-            <Menu class="h-5 w-5" />
-            <span class="sr-only">Toggle navigation menu</span>
-          </Button>
-        </SheetTrigger>
-        <SheetContent side="left">
-          <SheetDescription />
-          <SheetTitle>
-            <Package2 class="h-6 w-6 mb-6" />
-          </SheetTitle>
-          <nav class="grid gap-6 text-lg font-medium">
-            <div v-for="route in routerConfig" class="menu-item" @click="() => {
+            <Package2 class="size-5" />
+          </div>
+          <div class="menu-item" v-for="route in routerConfig" @click="redirect(route.path)">
+            {{ route.name }}
+          </div>
+        </div>
+        <Sheet v-model:open="sheet">
+          <SheetTrigger as-child>
+            <Button
+                variant="ghost"
+                size="icon"
+                class="shrink-0 sm:hidden drag-disabled"
+            >
+              <Menu class="size-5" />
+              <span class="sr-only">Toggle navigation menu</span>
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="left">
+            <SheetDescription />
+            <SheetTitle>
+              <Package2 class="size-6 mb-6" />
+            </SheetTitle>
+            <nav class="grid gap-6 text-lg font-medium">
+              <div v-for="route in routerConfig" class="menu-item" @click="() => {
               redirect(route.path);
               sheet = false;
             }">
-              {{ route.name }}
-            </div>
-          </nav>
-        </SheetContent>
-      </Sheet>
-      <Separator class="ml-4 mr-2 hidden md:block" orientation="vertical" />
-      <div class="toolbar">
-        <Button v-if="pomoStatus !== 'stopped'" variant="ghost" size="icon" @click="redirect('pomo')">
+                {{ route.name }}
+              </div>
+            </nav>
+          </SheetContent>
+        </Sheet>
+        <Separator class="ml-4 mr-2 hidden sm:block" orientation="vertical" />
+        <div class="toolbar">
+          <Button v-if="pomoStatus !== 'stopped'" variant="ghost" size="icon" @click="redirect('pomo')">
           <span v-if="pomoStatus === 'started'">
             <Timer
                 class="absolute inline-flex h-5 w-5 animate-ping-slow opacity-75"
@@ -94,12 +95,15 @@ onUnmounted(() => {
                 :class="pomoIsFocusPeriod ? 'text-yellow-500' : 'text-green-500'"
             />
           </span>
-          <Pause class="h-5 w-5 text-red-500" v-if="pomoStatus === 'paused'"/>
-        </Button>
-        <Button variant="ghost" size="icon" @click="">
-          <FolderSync class="h-5 w-5 stroke-1" />
-        </Button>
-      </div>
+            <Pause class="h-5 w-5 text-red-500" v-if="pomoStatus === 'paused'"/>
+          </Button>
+          <Button variant="ghost" size="icon" @click="">
+            <FolderSync class="h-5 w-5 stroke-1" />
+          </Button>
+        </div>
+
+      </nav>
+
       <WindowCtl />
     </header>
     <main class="w-full"

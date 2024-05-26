@@ -12,7 +12,8 @@ const close = () => {
 </script>
 
 <template>
-  <div class="absolute right-0 flex items-center h-full">
+  <div class="flex items-center h-full">
+  <!--<div class="absolute right-0 flex items-center h-full">-->
     <!--<div class="ctl-btn bg-green-500 border-green-600" />-->
     <div class="win-ctl-btn z-10" @click="min">
       <div class="bg-green-500 border-green-600 cursor-pointer" />
