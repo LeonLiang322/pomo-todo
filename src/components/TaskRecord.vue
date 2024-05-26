@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button';
 import { CircleCheckBig, Trash2, CheckCheck, Undo, Pin, PinOff } from 'lucide-vue-next';
+import { ref } from "vue";
 // import TaskMenu from "@/components/menus/TaskMenu.vue";
+
+const isActive = ref(false);
 
 const props = defineProps<{
   task: Task;
@@ -10,6 +13,7 @@ const props = defineProps<{
 const emits = defineEmits(['select', 'delete', 'complete', 'pin']);
 
 const handleSelect = () => {
+  isActive.value = !isActive.value;
   emits('select', props.task);
 };
 
@@ -28,7 +32,7 @@ const handleComplete = () => {
 
 <template>
   <div
-      class="flex items-center justify-between min-w-68 shadow-lg p-2 border border-gray-400 rounded-lg cursor-pointer"
+      class="flex items-center justify-between min-w-68 shadow-lg p-2 border-gray-400 rounded-lg cursor-pointer"
       @click="handleSelect"
   >
     <div class="flex items-center" >
