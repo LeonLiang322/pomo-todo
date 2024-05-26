@@ -26,8 +26,8 @@ const redirect = (path: string) => {
 };
 
 onMounted(() => {
-  updateMainHeight();
-  window.addEventListener('resize', debouncedUpdateMainHeight);
+  // updateMainHeight();
+  // window.addEventListener('resize', debouncedUpdateMainHeight);
   ipc.on('pomo-update-badge', (event: any, data: any) => {
     pomoStatus.value = data.status;
     pomoIsFocusPeriod.value = data.isFocusPeriod;
@@ -36,7 +36,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   ipc.removeAllListeners('pomo-update-badge');
-  window.removeEventListener('resize', debouncedUpdateMainHeight);
+  // window.removeEventListener('resize', debouncedUpdateMainHeight);
 });
 
 </script>
@@ -106,8 +106,7 @@ onUnmounted(() => {
 
       <WindowCtl />
     </header>
-    <main class="w-full"
-          :style="{ height: mainHeight + 'px' }">
+    <main class="w-full app-height">
       <RouterView />
     </main>
   </div>

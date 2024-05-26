@@ -82,6 +82,12 @@ module.exports = {
         "bounce-slow": "bounce 1s infinite",
         "ping-slow": "ping 2s cubic-bezier(0, 0, 0.2, 1) infinite",
       },
+      screens: {
+        'ysm': {'raw': '(min-height: 480px)'},
+        'ymd': {'raw': '(min-height: 640px)'},
+        'ylg': {'raw': '(min-height: 768px)'},
+        'yxl': {'raw': '(min-height: 1024px)'}
+      },
     },
   },
   plugins: [animate],

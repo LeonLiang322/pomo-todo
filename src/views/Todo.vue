@@ -208,18 +208,20 @@ onMounted(() => {
               @delete="deleteTask"
               @pin="pinTask"
           />
-          <Button
-              :class="cn('w-28 flex gap-2 items-center justify-between border-2 border-green-500 p-1 rounded-lg',
+          <div class="pt-2">
+            <Button
+                :class="cn('w-28 flex gap-2 items-center justify-between border-2 border-green-500 p-1 rounded-lg',
             completeExpanded && 'bg-green-500 text-white')"
-              variant="outline"
-              @click="handleExpandCompleted"
-          >
-            <ChevronRight :class="cn('h-5 w-5 transform transition-transform duration-300', completeExpanded && 'rotate-90')" />
-            <span>已完成</span>
-            <span class="mr-2 font-black" :class="cn('mr-2 font-black', !completeExpanded && 'text-green-500')">
-            {{ filteredCompletedTasks.length }}
-          </span>
-          </Button>
+                variant="outline"
+                @click="handleExpandCompleted"
+            >
+              <ChevronRight :class="cn('h-5 w-5 transform transition-transform duration-300', completeExpanded && 'rotate-90')" />
+              <span>已完成</span>
+              <span class="mr-2 font-black" :class="cn('mr-2 font-black', !completeExpanded && 'text-green-500')">
+                {{ filteredCompletedTasks.length }}
+              </span>
+            </Button>
+          </div>
           <transition name="fade">
             <div v-if="completeExpanded">
               <TaskRecords
