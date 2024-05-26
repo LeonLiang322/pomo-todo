@@ -102,7 +102,6 @@ onMounted(() => {
       </DialogHeader>
       <div class="flex flex-col gap-3 items-center justify-center">
         <p>确定要删除列表 <span class="font-bold">{{ deleteInfo?.name }}</span> 吗?</p>
-
         <div v-if="showWarning" class="flex items-center italic">
           <TriangleAlert class="size-4 mr-2 text-red-500" />
           <p class="mr-4 text-red-500">列表中的任务将被全部删除</p>
