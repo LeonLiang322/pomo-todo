@@ -2,7 +2,7 @@ import { ipcMain } from 'electron';
 import Store from 'electron-store';
 
 const configStore = new Store({ name: 'config' });
-const sessionStore = new Store({ name: 'session' });
+const dataStore = new Store({ name: 'data' });
 
 export function initStoreHandlers() {
     ipcMain.on('config-store-get', (e, key) => {
@@ -18,16 +18,16 @@ export function initStoreHandlers() {
         for (const key of keys) configStore.delete(key);
     });
 
-    ipcMain.on('session-store-get', (e, key) => {
-        const value = sessionStore.get(key);
+    ipcMain.on('data-store-get', (e, key) => {
+        const value = dataStore.get(key);
         e.returnValue = value || "";
     });
 
-    ipcMain.on('session-store-set', (e, data) => {
-        sessionStore.set(data);
+    ipcMain.on('data-store-set', (e, data) => {
+        dataStore.set(data);
     });
 
-    ipcMain.on('session-store-del', (e, keys) => {
-        for (const key of keys) sessionStore.delete(key);
+    ipcMain.on('data-store-del', (e, keys) => {
+        for (const key of keys) dataStore.delete(key);
     });
 }

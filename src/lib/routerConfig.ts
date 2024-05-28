@@ -15,6 +15,11 @@ const routerConfig = [
         component: () => import('@/views/Todo.vue'),
     },
     {
+        path: 'habit',
+        name: '习惯养成',
+        component: () => import('@/views/Habit.vue'),
+    },
+    {
         path: 'pomo',
         name: '专注时钟',
         component: () => import('@/views/Pomodoro.vue'),

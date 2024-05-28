@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onBeforeUnmount, onMounted, ref } from 'vue';
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Pause, Play, Square, Minus, Plus } from "lucide-vue-next";
@@ -13,8 +13,8 @@ const isPaused = ref(false);
 
 const remainingTime = ref(0);
 const isFocusPeriod = ref(true);
-const focusMinutes = ref([ipc.sendSync('config-store-get', 'focusMinutes') || 25]);
-const breakMinutes = ref([ipc.sendSync('config-store-get', 'breakMinutes') || 5]);
+const focusMinutes = ref<number[]>([ipc.sendSync('config-store-get', 'focusMinutes') || 25]);
+const breakMinutes = ref<number[]>([ipc.sendSync('config-store-get', 'breakMinutes') || 5]);
 
 const updateTimerStatus = (event: any, data: { isRunning: boolean, remainingTime: number, isFocusPeriod: boolean }) => {
   if (data) {
@@ -102,7 +102,7 @@ onMounted(() => {
             v-if="!isStarted"
             v-model="focusMinutes"
             :max="60"
-            :min="15"
+            :min="1"
             :step="1"
         />
         <div v-else>
@@ -160,7 +160,7 @@ onMounted(() => {
             v-if="!isStarted"
             v-model="breakMinutes"
             :max="15"
-            :min="3"
+            :min="1"
             :step="1"
         />
         <p v-else class="text-6xl lg:text-8xl my-4 lg:my-6 mx-10 font-black">

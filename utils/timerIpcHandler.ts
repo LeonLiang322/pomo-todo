@@ -20,6 +20,8 @@ export function initTimerHandlers(win: BrowserWindow | null) {
                     case 'pomo-status-updated':
                         win?.webContents.send('pomo-update-badge', data);
                         break;
+                    case 'pomo-data-update':
+                        break;
                     default:
                         win?.webContents.send('timer-update', data);
                         break;
