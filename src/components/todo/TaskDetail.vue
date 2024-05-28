@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -32,9 +32,17 @@ const lists = defineModel<TaskList[]>('lists');
 const showDueDatePopover = ref(false);
 const editTemp = ref();
 const calendarDate = ref<DateValue>();
+const taskList = ref(taskBelongList.value);
+
+watch(taskBelongList, (newValue) => {
+  taskList.value = newValue;
+});
+
+watch(taskDueDate, (newValue) => {
+  calendarDate.value = newValue;
+});
 
 const emits = defineEmits(['update']);
-
 
 const saveDueDate = (date: DateValue | undefined) => {
   showDueDatePopover.value = false;
@@ -44,8 +52,8 @@ const saveDueDate = (date: DateValue | undefined) => {
 };
 
 const updateTaskList = () => {
-  if (!taskBelongList.value) return;
-  emits('update', taskIndex.value, { list_id: parseInt(taskBelongList.value) });
+  if (!taskList.value) return;
+  emits('update', taskIndex.value, { list_id: parseInt(taskList.value) });
 };
 
 const editGate = (v: any, e: Function) => {
@@ -115,7 +123,7 @@ const editGate = (v: any, e: Function) => {
       <List class="size-4 mr-3" />
       <div class="grow">
         <Select
-            v-model="taskBelongList"
+            v-model="taskList"
             @update:modelValue="updateTaskList"
         >
           <SelectTrigger>
