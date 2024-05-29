@@ -21,7 +21,6 @@ function initDataBase() {
             due_date DATE DEFAULT NULL,
             completed BOOLEAN DEFAULT 0,
             create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            update_time TIMESTAMP DEFAULT NULL,
             finish_time TIMESTAMP DEFAULT NULL,
             list_id INTEGER NOT NULL DEFAULT 1,
             pinned BOOLEAN DEFAULT 0
@@ -34,6 +33,11 @@ function initDataBase() {
             todo_count INTEGER DEFAULT 0,
             pinned BOOLEAN DEFAULT 0
         );
+
+--         CREATE TABLE IF NOT EXISTS habit (
+--             id INTEGER PRIMARY KEY AUTOINCREMENT,
+--             name TEXT NOT NULL
+--         );
 
         INSERT OR IGNORE INTO list (id, name) VALUES (1, 'default');
 

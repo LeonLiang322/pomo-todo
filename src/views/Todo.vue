@@ -29,7 +29,6 @@ const taskDescription = ref('');
 const taskNote = ref('');
 const taskDueDate = ref<DateValue>();
 const taskCreateTime = ref();
-const taskUpdateTime = ref();
 const taskFinishTime = ref();
 const taskBelongList = ref('1');
 
@@ -62,7 +61,6 @@ const cleanTaskInfo = () => {
   taskNote.value = '';
   taskDueDate.value = undefined;
   taskCreateTime.value = '';
-  taskUpdateTime.value = '';
   taskFinishTime.value = '';
   taskBelongList.value = '1';
 };
@@ -85,9 +83,6 @@ const cancelNewTask = () => {
 const updateTask = (id: number, updatedData: any) => {
   console.log('updating')
   if (updatedData.description?.length === 0) return;
-  const currentTime = getCurrentTime();
-  taskUpdateTime.value = currentTime;
-  updatedData.update_time = currentTime;
   ipc.sendSync('db-operation', { action: 'update', table: 'task', id, data: updatedData });
   fetchAllData();
 };
@@ -106,7 +101,6 @@ const handleTaskSelect = (task: Task) => {
   taskNote.value = task.note;
   taskDueDate.value = task.due_date ? parseDate(task.due_date) : undefined;
   taskCreateTime.value = task.create_time;
-  taskUpdateTime.value = task.update_time;
   taskFinishTime.value = task.finish_time;
   taskBelongList.value = task.list_id + '';
   if (window.innerWidth <= 640) {
@@ -280,7 +274,6 @@ onMounted(() => {
               v-model:taskNote="taskNote"
               v-model:taskDueDate="taskDueDate"
               v-model:taskCreateTime="taskCreateTime"
-              v-model:taskUpdateTime="taskUpdateTime"
               v-model:taskFinishTime="taskFinishTime"
               v-model:taskBelongList="taskBelongList"
               v-model:lists="lists"
@@ -303,7 +296,6 @@ onMounted(() => {
               v-model:taskNote="taskNote"
               v-model:taskDueDate="taskDueDate"
               v-model:taskCreateTime="taskCreateTime"
-              v-model:taskUpdateTime="taskUpdateTime"
               v-model:taskFinishTime="taskFinishTime"
               v-model:taskBelongList="taskBelongList"
               v-model:lists="lists"

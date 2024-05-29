@@ -61,17 +61,21 @@ onMounted(() => {
       class="grid gap-2 pr-2 pb-4"
       v-if="lists && lists.length > 0"
   >
-    <Badge
-        class="px-4 py-1 sticky top-0 w-full cursor-pointer shadow-lg border border-green-500
-          bg-white hover:bg-green-500 hover:text-white z-10 rounded-t-none"
-        variant="outline"
-        @click="showAddDialog=true"
-    >
-      <div class="flex items-center justify-between w-full">
-        <span>新建列表</span>
-        <span class="mr-2 text-lg">+</span>
-      </div>
-    </Badge>
+
+    <div class="sticky top-0 z-10 bg-white rounded-b-lg">
+      <Badge
+          class="px-4 py-1 w-full cursor-pointer shadow-lg border border-green-500
+           hover:bg-green-500 hover:text-white"
+          variant="outline"
+          @click="showAddDialog=true"
+      >
+        <div class="flex items-center justify-between w-full">
+          <span>新建列表</span>
+          <span class="mr-2 text-lg">+</span>
+        </div>
+      </Badge>
+    </div>
+
     <Badge
         class="pl-4 cursor-pointer shadow-lg border border-gray-400"
         v-for="list in lists"

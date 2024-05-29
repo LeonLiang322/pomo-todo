@@ -6,8 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Tag, CalendarDays, List, Check, X } from 'lucide-vue-next';
+import { Tag, CalendarDays, List, Check, X, Plus } from 'lucide-vue-next';
 import {
   DateFormatter,
   type DateValue,
@@ -24,7 +23,6 @@ const taskDescription = defineModel<string>('taskDescription');
 const taskNote = defineModel<string>('taskNote');
 const taskDueDate = defineModel<DateValue>('taskDueDate');
 const taskCreateTime = defineModel<string>('taskCreateTime');
-const taskUpdateTime = defineModel<string>('taskUpdateTime');
 const taskFinishTime = defineModel<string>('taskFinishTime');
 const taskBelongList = defineModel<string>('taskBelongList');
 const lists = defineModel<TaskList[]>('lists');
@@ -145,18 +143,9 @@ const editGate = (v: any, e: Function) => {
       })"
     />
     <div class="text-xs text-gray-500 italic">
-      <div>
-        <span v-if="!taskUpdateTime">创建于 {{ taskCreateTime }}</span>
-        <TooltipProvider v-else>
-          <Tooltip>
-            <TooltipTrigger as-child>
-              <span>最后更新于 {{ taskUpdateTime }}</span>
-            </TooltipTrigger>
-            <TooltipContent side="top">
-              创建于 {{ taskCreateTime }}
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+      <div class="flex items-center">
+        <Plus class="size-4 text-blue-500 mr-2" />
+        创建于 {{ taskCreateTime }}
       </div>
       <div class="mt-2 flex items-center" v-if="taskFinishTime">
         <Check class="size-4 text-green-500 mr-2" />
