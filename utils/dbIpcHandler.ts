@@ -34,10 +34,23 @@ function initDataBase() {
             pinned BOOLEAN DEFAULT 0
         );
 
---         CREATE TABLE IF NOT EXISTS habit (
---             id INTEGER PRIMARY KEY AUTOINCREMENT,
---             name TEXT NOT NULL
---         );
+        CREATE TABLE IF NOT EXISTS habit (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            interval INTEGER NOT NULL,
+            longest_streak INTEGER DEFAULT 0,
+            current_streak INTEGER DEFAULT 0,
+            status INTEGER DEFAULT 0,
+            create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+
+        CREATE TABLE IF NOT EXISTS habit_log (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            habit_id INTEGER NOT NULL,
+            date DATE NOT NULL,
+            is_skip BOOLEAN DEFAULT 0,
+            FOREIGN KEY (habit_id) REFERENCES habit(id)
+        );
 
         INSERT OR IGNORE INTO list (id, name) VALUES (1, 'default');
 
@@ -97,7 +110,7 @@ function initDataBase() {
     `);
 
     ipcMain.on('db-operation', (event, args) => {
-        const { action, table, data, id, condition } = args;
+        const { action, table, data, id, sql, params } = args;
         let stmt, result;
 
         switch (action) {
@@ -122,8 +135,16 @@ function initDataBase() {
                 result = stmt.get(id);
                 break;
             case 'select-all':
-                stmt = db.prepare(`SELECT * FROM ${table} ${condition}`);
+                stmt = db.prepare(`SELECT * FROM ${table}`);
                 result = stmt.all();
+                break;
+            case 'custom':
+                stmt = db.prepare(sql);
+                if (sql.trim().toUpperCase().startsWith('SELECT')) {
+                    result = stmt.all(...params);
+                } else {
+                    result = stmt.run(...params);
+                }
                 break;
             default:
                 throw new Error(`Unknown action: ${action}`);

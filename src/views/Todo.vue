@@ -34,8 +34,17 @@ const taskBelongList = ref('1');
 
 // 获取所有任务和列表
 const fetchAllData = () => {
-  incompleteTasks.value = ipc.sendSync('db-operation', { action: 'select-all', table: 'task', condition: 'WHERE completed = 0 ORDER BY pinned DESC, id DESC' });
-  completedTasks.value = ipc.sendSync('db-operation', { action: 'select-all', table: 'task', condition: 'WHERE completed = 1 ORDER BY pinned DESC, id DESC' });
+  incompleteTasks.value = ipc.sendSync('db-operation', {
+    action: 'custom',
+    sql: 'SELECT * FROM task WHERE completed = ? ORDER BY pinned DESC, id DESC',
+    params: [0],
+  });
+  console.log(incompleteTasks.value)
+  completedTasks.value = ipc.sendSync('db-operation', {
+    action: 'custom',
+    sql: 'SELECT * FROM task WHERE completed = ? ORDER BY pinned DESC, id DESC',
+    params: [1],
+  });
   lists.value = ipc.sendSync('db-operation', { action: 'select-all', table: 'list' });
   lists.value[0].name = '默认';
 };
