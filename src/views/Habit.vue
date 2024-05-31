@@ -1,5 +1,3 @@
-
-
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 
@@ -48,7 +46,7 @@ const createHabit = () => {
 const checkIn = (habitId: number) => {
   (window as any).ipcRenderer.sendSync('db-operation', {
     action: 'custom',
-    sql: 'INSERT INTO habit_log (habit_id, date, is_skip) VALUES (?, DATE(\'now\'), 0)',
+    sql: 'INSERT INTO habit_log (habit_id, is_skip) VALUES (?, 0)',
     params: [habitId]
   });
   fetchHabits();

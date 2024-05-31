@@ -47,7 +47,7 @@ function initDataBase() {
         CREATE TABLE IF NOT EXISTS habit_log (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             habit_id INTEGER NOT NULL,
-            date DATE NOT NULL,
+            date DATE DEFAULT CURRENT_DATE,
             is_skip BOOLEAN DEFAULT 0,
             FOREIGN KEY (habit_id) REFERENCES habit(id)
         );
