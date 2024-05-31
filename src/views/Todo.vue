@@ -39,7 +39,6 @@ const fetchAllData = () => {
     sql: 'SELECT * FROM task WHERE completed = ? ORDER BY pinned DESC, id DESC',
     params: [0],
   });
-  console.log(incompleteTasks.value)
   completedTasks.value = ipc.sendSync('db-operation', {
     action: 'custom',
     sql: 'SELECT * FROM task WHERE completed = ? ORDER BY pinned DESC, id DESC',
