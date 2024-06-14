@@ -48,7 +48,6 @@ function initDataBase() {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             habit_id INTEGER NOT NULL,
             date DATE DEFAULT CURRENT_DATE,
-            is_skip BOOLEAN DEFAULT 0,
             FOREIGN KEY (habit_id) REFERENCES habit(id)
         );
 

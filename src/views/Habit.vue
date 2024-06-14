@@ -23,7 +23,7 @@ const fetchHabits = () => {
     sql: `
       SELECT h.*,
         CASE
-          WHEN (SELECT COUNT(*) FROM habit_log hl WHERE hl.habit_id = h.id AND hl.date = DATE('now') AND hl.is_skip = 0) > 0 THEN 1
+          WHEN (SELECT COUNT(*) FROM habit_log hl WHERE hl.habit_id = h.id AND hl.date = DATE('now')) > 0 THEN 1
           ELSE 0
         END AS checked_in_today
       FROM habit h;
@@ -46,17 +46,7 @@ const createHabit = () => {
 const checkIn = (habitId: number) => {
   (window as any).ipcRenderer.sendSync('db-operation', {
     action: 'custom',
-    sql: 'INSERT INTO habit_log (habit_id, is_skip) VALUES (?, 0)',
-    params: [habitId]
-  });
-  fetchHabits();
-};
-
-// 跳过打卡
-const skipCheckIn = (habitId: number) => {
-  (window as any).ipcRenderer.sendSync('db-operation', {
-    action: 'custom',
-    sql: 'INSERT INTO habit_log (habit_id, date, is_skip) VALUES (?, DATE(\'now\'), 1)',
+    sql: 'INSERT INTO habit_log (habit_id) VALUES (?)',
     params: [habitId]
   });
   fetchHabits();
@@ -87,9 +77,6 @@ onMounted(() => {
 
       <button @click="checkIn(habit.id)" :disabled="habit.checked_in_today" class="bg-green-500 text-white p-2 mr-2">
         打卡
-      </button>
-      <button @click="skipCheckIn(habit.id)" class="bg-yellow-500 text-white p-2">
-        跳过
       </button>
     </div>
   </div>
