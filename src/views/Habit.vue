@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface Habit {
   id: number;
@@ -58,15 +59,30 @@ onMounted(() => {
 </script>
 
 <template>
+  <div class="border-2 flex justify-center flex-wrap gap-4 p-4 h-full overflow-y-auto">
+
+    <Card class="h-72" v-for="habit in habits" :key="habit.id">
+      <CardHeader>
+        <CardTitle>{{ habit.name }}</CardTitle>
+        <CardDescription />
+      </CardHeader>
+      <CardContent>
+        <p>间隔天数: {{ habit.interval }}</p>
+        <p>最长连续打卡记录: {{ habit.longest_streak }}</p>
+        <p>当前连续打卡记录: {{ habit.current_streak }}</p>
+        <p>今日是否已打卡: {{ habit.checked_in_today ? '是' : '否' }}</p>
+        <p>习惯状态: {{ habit.status === -1 ? '失败' : habit.status === 0 ? '进行中' : '成功' }}</p>
+      </CardContent>
+      <CardFooter>
+        Card Footer
+      </CardFooter>
+    </Card>
+
+
+
+  </div>
   <div class="p-6">
     <h1 class="text-2xl font-bold mb-4">习惯养成</h1>
-
-    <div class="mb-4">
-      <input v-model="newHabitName" placeholder="新习惯名称" class="border p-2 mr-2" />
-      <input v-model="newHabitInterval" type="number" min="1" placeholder="间隔天数" class="border p-2 mr-2" />
-      <button @click="createHabit" class="bg-blue-500 text-white p-2">创建习惯</button>
-    </div>
-
     <div v-for="habit in habits" :key="habit.id" class="mb-4 p-4 border rounded">
       <h2 class="text-xl font-semibold">{{ habit.name }}</h2>
       <p>间隔天数: {{ habit.interval }}</p>
