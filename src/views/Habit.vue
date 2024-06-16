@@ -74,32 +74,17 @@ onMounted(() => {
         <p>习惯状态: {{ habit.status === -1 ? '失败' : habit.status === 0 ? '进行中' : '成功' }}</p>
       </CardContent>
       <CardFooter>
-        Card Footer
+        <button @click="checkIn(habit.id)" :disabled="habit.checked_in_today" class="bg-green-500 text-white p-2 mr-2">
+          打卡
+        </button>
       </CardFooter>
     </Card>
 
 
 
   </div>
-  <div class="p-6">
-    <h1 class="text-2xl font-bold mb-4">习惯养成</h1>
-    <div v-for="habit in habits" :key="habit.id" class="mb-4 p-4 border rounded">
-      <h2 class="text-xl font-semibold">{{ habit.name }}</h2>
-      <p>间隔天数: {{ habit.interval }}</p>
-      <p>最长连续打卡记录: {{ habit.longest_streak }}</p>
-      <p>当前连续打卡记录: {{ habit.current_streak }}</p>
-      <p>今日是否已打卡: {{ habit.checked_in_today ? '是' : '否' }}</p>
-      <p>习惯状态: {{ habit.status === -1 ? '失败' : habit.status === 0 ? '进行中' : '成功' }}</p>
-
-      <button @click="checkIn(habit.id)" :disabled="habit.checked_in_today" class="bg-green-500 text-white p-2 mr-2">
-        打卡
-      </button>
-    </div>
-  </div>
 </template>
 
 <style scoped>
-.border {
-  border: 1px solid #ccc;
-}
+
 </style>
